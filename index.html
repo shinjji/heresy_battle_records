@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Heresy Battle Records</title>
+<link rel="icon" id="favicon" type="image/png" href=""/>
+<script>
+(function setRandomFavicon() {
+  const ids = [
+    "10mz9lmq-15HD4AyaI7GXuX1CQRW6NYaT",
+    "1nWV-rUkEpNiZjT7_ZTcX1kw9lZAwbmm1",
+    "1cHfSjHZXUJCUQNmflhP_lbZ55HD4mF24",
+    "1GhYxiAHr3Y5BsMcosnCjNAs0dDwa4aZz",
+    "1AyKqwOmBEnUM-zWZ3Gtc7n55yZCTd9fJ",
+    "12kyKSrU3Olnh-CGAMEalOeVbnbKPTb05",
+    "1xvEFyFZW-s8HZwr-qK6l-RyKfthVWpN9",
+    "1O3XYWi0EaZs5ZZ4bSUgfLWbx1jUggtKu",
+    "1vgXEEcw_i7kjZNxkyCH69TBaGT1R4f7f",
+    "1nWbZVqaI1eJDrcAu3_HmV8dyLsLLTPRB",
+    "1ysCrVyKcPV7Ot8IzoHqRdVAzYnf5udz6",
+    "1HOrDCOiMjYzcEo0E3631P9srd-IdYFY2",
+    "1HMxLAcdEfrBkkLO9VDwhvfd7C11X6TdH",
+    "1Puejk0kyBzCEa3XRTvHDX7qYIpqTax6e",
+    "15zRLgGz2Y84x_9tKtiJym9MxSHazPuN8",
+    "1bww94aNvnXJiv_btdR1igpP2TQt02jhD",
+    "1hu8gjfqJPGYZsob7ujIDmBN7ff6Yu-OP",
+    "13v0LG_nt2ABvrfk5gL8QqzwD30CzI77-",
+    "1Y9zQzTKrJdvUQqV5N_qRnk0mGkdJqtqU",
+    "1fmAO-fRmMi7ZmfI7ESezf2QujQw-lier",
+    "1zcenhEvGSS_wS374_FnMegwOP3JYWgaW",
+    "12m-XubPXhIbpbKu6IwxPX3Lfcyxe-Wji",
+    "1dJkIuN8cces0pokyWRnHv6LtHkRA_QM8",
+    "1peN6yOtAEYZmggltgrtLG6puzxauTOC1",
+    "1DYkzlg561ZasNd-kSY_jwbQ2Cql_dfvu",
+  ];
+  const id = ids[Math.floor(Math.random() * ids.length)];
+  document.getElementById("favicon").href = `https://wsrv.nl/?url=https://drive.google.com/uc?id=${id}`;
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold: #c9a84c; --gold-dark: #8a6a1e; --gold-light: #e8c96a;
+  --blood: #8b1a1a; --blood-light: #c0392b;
+  --ash: #1a1612; --ash-mid: #2a2218; --ash-light: #3d3025;
+  --parchment: #c4b49a; --parchment-light: #d8c9af; --parchment-dark: #8a7a65;
+  --iron: #4a4540; --iron-light: #6b635c;
+  --text-primary: #e8dcc8; --text-secondary: #a89880; --text-dim: #6b5e4e;
+  --border: rgba(201,168,76,0.25); --border-strong: rgba(201,168,76,0.5);
+  --font-display: 'Cinzel Decorative', serif;
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Crimson Text', serif;
+}
+html, body { height: 100%; }
+body { background: var(--ash); color: var(--text-primary); font-family: var(--font-body); font-size: 17px; line-height: 1.6; min-height: 100vh; }
+.bg-texture {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px);
+}
+.bg-vignette {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.7) 100%);
+}
+.content { position: relative; z-index: 1; }
+
+/* HEADER */
+.header {
+  border-bottom: 1px solid var(--border-strong); padding: 0;
+  background: linear-gradient(180deg, rgba(10,8,6,0.95) 0%, rgba(26,22,18,0.9) 100%);
+  position: sticky; top: 0; z-index: 100;
+}
+.header-inner {
+  max-width: 1100px; margin: 0 auto; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.header-title-block { padding: 16px 0; }
+.header-eyebrow { font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.4em; color: var(--gold-dark); text-transform: uppercase; margin-bottom: 2px; }
+.header-title { font-family: var(--font-display); font-size: clamp(14px, 2.5vw, 22px); color: var(--gold); letter-spacing: 0.05em; line-height: 1.1; text-shadow: 0 0 30px rgba(201,168,76,0.3); }
+.header-skull { font-size: 28px; opacity: 0.4; flex-shrink: 0; }
+
+/* NAV */
+.nav { display: flex; gap: 0; border-top: 1px solid var(--border); }
+.nav-btn {
+  background: none; border: none; color: var(--text-dim);
+  font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.2em;
+  text-transform: uppercase; padding: 10px 20px; cursor: pointer;
+  border-right: 1px solid var(--border); transition: all 0.2s; position: relative;
+}
+.nav-btn:hover { color: var(--gold); background: rgba(201,168,76,0.05); }
+.nav-btn.active { color: var(--gold); background: rgba(201,168,76,0.08); }
+.nav-btn.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--gold); }
+
+/* MAIN */
+.main { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+/* CONFIG BANNER */
+.config-banner {
+  border: 1px solid var(--blood); background: rgba(139,26,26,0.1);
+  padding: 16px 20px; margin-bottom: 28px;
+  position: relative; display: flex; align-items: center; gap: 16px;
+}
+.config-banner::before { content: ''; position: absolute; top: -1px; left: 0; width: 4px; bottom: -1px; background: var(--blood); }
+.config-banner-text { font-size: 14px; color: var(--parchment); flex: 1; }
+.config-banner-text strong { color: var(--gold); font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.1em; }
+
+/* SECTION HEADER */
+.section-header { margin-bottom: 28px; }
+.section-eyebrow { font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.4em; color: var(--gold-dark); text-transform: uppercase; margin-bottom: 6px; }
+.section-title { font-family: var(--font-display); font-size: clamp(18px, 3vw, 26px); color: var(--gold); letter-spacing: 0.05em; }
+.section-rule { margin-top: 10px; height: 1px; background: linear-gradient(90deg, var(--gold-dark), rgba(201,168,76,0.1)); }
+
+/* PANEL */
+.panel { background: rgba(26,22,18,0.8); border: 1px solid var(--border); padding: 24px; margin-bottom: 20px; position: relative; }
+.panel::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--gold-dark); }
+.panel-title { font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.25em; color: var(--gold); text-transform: uppercase; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+
+/* FORM */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-col-full { grid-column: 1 / -1; }
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.25em; color: var(--text-dim); text-transform: uppercase; }
+.form-input, .form-select, .form-textarea {
+  background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+  color: var(--text-primary); font-family: var(--font-body); font-size: 16px;
+  padding: 10px 14px; width: 100%; transition: border-color 0.2s;
+  appearance: none; -webkit-appearance: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--gold-dark); background: rgba(0,0,0,0.6); }
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a84c' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer;
+}
+.form-select option { background: #1a1612; color: #e8dcc8; }
+.form-textarea { resize: vertical; min-height: 90px; }
+
+.form-label.error { color: var(--blood-light); }
+.radio-group.error .radio-label { border-color: var(--blood); }
+
+
+.radio-group { display: flex; gap: 0; height: 43px; }
+.radio-option { flex: 1; display: flex; }
+.radio-option input { display: none; }
+.radio-label {
+  display: flex; align-items: center; justify-content: center;
+  flex: 1; padding: 0 12px;
+  border: 1px solid var(--border); cursor: pointer;
+  font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.2em;
+  color: var(--text-dim); text-transform: uppercase; transition: all 0.2s;
+  border-right-width: 0;
+}
+.radio-option:last-child .radio-label { border-right-width: 1px; }
+.radio-label:hover { border-color: var(--gold-dark); color: var(--parchment); }
+.radio-option input:checked + .radio-label { background: rgba(139,26,26,0.3); border-color: var(--blood-light); color: var(--parchment-light); }
+.radio-option.victory input:checked + .radio-label { background: rgba(63,100,40,0.3); border-color: #5a8c35; color: #a8d88a; }
+
+/* BTN */
+.btn {
+  font-family: var(--font-heading); letter-spacing: 0.2em; text-transform: uppercase;
+  font-size: 11px; padding: 14px 32px; cursor: pointer;
+  border: 1px solid; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+  background: none;
+}
+.btn-primary { background: rgba(139,26,26,0.2); border-color: var(--blood); color: var(--parchment-light); }
+.btn-primary:hover { background: rgba(139,26,26,0.4); border-color: var(--blood-light); }
+.btn-secondary { background: rgba(201,168,76,0.1); border-color: var(--gold-dark); color: var(--gold); }
+.btn-secondary:hover { background: rgba(201,168,76,0.2); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-sm { font-size: 9px; padding: 8px 16px; }
+
+/* MODAL */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  z-index: 200; display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.modal-backdrop.hidden { display: none; }
+.modal { background: var(--ash-mid); border: 1px solid var(--border-strong); padding: 32px; max-width: 560px; width: 100%; position: relative; }
+.modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--blood), var(--gold-dark), var(--blood)); }
+.modal-title { font-family: var(--font-display); font-size: 18px; color: var(--gold); margin-bottom: 8px; }
+.modal-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; }
+
+/* STATS */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card { background: rgba(0,0,0,0.4); border: 1px solid var(--border); padding: 20px 16px; text-align: center; position: relative; }
+.stat-card::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 40%; height: 1px; background: var(--gold-dark); }
+.stat-value { font-family: var(--font-display); font-size: 32px; color: var(--gold); line-height: 1; margin-bottom: 8px; text-shadow: 0 0 20px rgba(201,168,76,0.3); }
+.stat-label { font-family: var(--font-heading); font-size: 8px; letter-spacing: 0.3em; color: var(--text-dim); text-transform: uppercase; }
+.stat-sub { font-size: 12px; color: var(--blood-light); margin-top: 4px; font-family: var(--font-heading); }
+
+/* CHARTS */
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+.chart-panel { background: rgba(0,0,0,0.4); border: 1px solid var(--border); padding: 20px; }
+.chart-title { font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.25em; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.pie-container { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.pie-legend { flex: 1; min-width: 120px; }
+.pie-legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--text-secondary); }
+.pie-dot { width: 10px; height: 10px; flex-shrink: 0; }
+
+/* RECORDS */
+.record-card { background: rgba(20,16,12,0.8); border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; transition: border-color 0.2s; }
+.record-card:hover { border-color: var(--gold-dark); }
+.record-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; border-bottom: 1px solid transparent; transition: background 0.2s; user-select: none; }
+.record-header:hover { background: rgba(201,168,76,0.04); }
+.record-header.open { border-bottom-color: var(--border); }
+.record-header-left { display: flex; align-items: center; gap: 16px; }
+.record-number { font-family: var(--font-display); font-size: 11px; color: var(--gold-dark); width: 28px; }
+.record-mission { font-family: var(--font-heading); font-size: 12px; letter-spacing: 0.1em; color: var(--parchment); }
+.record-meta { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+.record-tags { display: flex; gap: 8px; align-items: center; }
+.tag { font-family: var(--font-heading); font-size: 8px; letter-spacing: 0.2em; padding: 3px 8px; text-transform: uppercase; }
+.tag-victory { background: rgba(63,100,40,0.25); border: 1px solid #3f6428; color: #7dc64a; }
+.tag-defeat { background: rgba(139,26,26,0.25); border: 1px solid var(--blood); color: #dd4444; }
+.tag-draw { background: rgba(80,70,50,0.25); border: 1px solid var(--iron-light); color: var(--text-secondary); }
+.tag-warlord-dead { background: rgba(60,20,20,0.4); border: 1px solid #4a2222; color: #a06060; }
+.record-chevron { color: var(--gold-dark); font-size: 10px; transition: transform 0.2s; display: inline-block; }
+.record-chevron.open { transform: rotate(90deg); }
+.record-body { padding: 20px; display: none; }
+.record-body.open { display: block; }
+.record-body-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+.record-field-label { font-family: var(--font-heading); font-size: 8px; letter-spacing: 0.25em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+.record-field-value { font-size: 15px; color: var(--parchment); }
+.record-images { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.record-img { width: 100px; height: 75px; object-fit: cover; border: 1px solid var(--border); cursor: pointer; transition: border-color 0.2s; filter: sepia(0.2) contrast(1.05); }
+.record-img:hover { border-color: var(--gold-dark); }
+.record-highlight { border-left: 2px solid var(--gold-dark); padding-left: 14px; font-style: italic; color: var(--text-secondary); margin-top: 14px; }
+
+/* TABLE */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { font-family: var(--font-heading); font-size: 8px; letter-spacing: 0.25em; color: var(--gold-dark); text-transform: uppercase; text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.data-table td { padding: 10px 14px; border-bottom: 1px solid rgba(201,168,76,0.08); font-size: 14px; color: var(--text-secondary); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: rgba(201,168,76,0.03); color: var(--parchment); }
+.td-strong { color: var(--parchment); font-family: var(--font-heading); font-size: 12px; letter-spacing: 0.05em; }
+.td-victory { color: #7dc64a; }
+.td-blood { color: var(--blood-light); }
+
+/* EMPTY STATE */
+.empty-state { text-align: center; padding: 60px 24px; border: 1px dashed var(--border); color: var(--text-dim); }
+.empty-state-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.3; }
+.empty-state-text { font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 32px; right: 32px; z-index: 300;
+  padding: 14px 24px; border: 1px solid;
+  font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.15em;
+  animation: slideIn 0.3s ease; display: none;
+}
+.toast.show { display: block; }
+.toast-success { background: rgba(40,80,20,0.9); border-color: #5a8c35; color: #a8d88a; }
+.toast-error { background: rgba(100,20,20,0.9); border-color: var(--blood); color: #ee8888; }
+@keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* LOADING */
+.loading { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 48px; color: var(--text-dim); font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.3em; }
+.loading-spinner { width: 20px; height: 20px; border: 1px solid var(--border); border-top-color: var(--gold); animation: spin 1s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* DIVIDER */
+.divider { display: flex; align-items: center; gap: 12px; margin: 28px 0; color: var(--text-dim); font-family: var(--font-heading); font-size: 9px; letter-spacing: 0.3em; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* LIGHTBOX */
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 400; display: none; align-items: center; justify-content: center; cursor: pointer; }
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 85vw; max-height: 85vh; object-fit: contain; }
+.lightbox-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,0.6); border: 1px solid var(--border-strong);
+  color: var(--gold); font-size: 48px; line-height: 1; padding: 8px 18px;
+  cursor: pointer; transition: all 0.2s; z-index: 1;
+  font-family: serif; display: flex; align-items: center; justify-content: center;
+}
+.lightbox-btn:hover { background: rgba(201,168,76,0.15); color: var(--gold-light); }
+.lightbox-prev { left: 24px; }
+.lightbox-next { right: 24px; }
+.lightbox-btn.hidden { opacity: 0; pointer-events: none; }
+.lightbox-close {
+  position: absolute; top: 20px; right: 24px;
+  background: rgba(0,0,0,0.6); border: 1px solid var(--border);
+  color: var(--text-secondary); font-size: 18px; padding: 6px 12px;
+  cursor: pointer; transition: all 0.2s;
+}
+.lightbox-close:hover { color: var(--gold); border-color: var(--gold-dark); }
+.lightbox-counter {
+  position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-heading); font-size: 10px; letter-spacing: 0.3em;
+  color: var(--text-dim); text-transform: uppercase;
+}
+
+/* UTILITY */
+.hidden { display: none !important; }
+.flex-end { display: flex; justify-content: flex-end; margin-top: 8px; }
+.flex-row { display: flex; gap: 12px; align-items: center; }
+.mb-16 { margin-bottom: 16px; }
+.mt-20 { margin-top: 20px; }
+.color-gold { color: var(--gold); }
+.color-victory { color: #7dc64a; }
+.color-blood { color: var(--blood-light); }
+.note-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 10px 14px; font-size: 12px; color: var(--text-dim); font-family: var(--font-heading); letter-spacing: 0.05em; line-height: 1.7; }
+
+@media (max-width: 700px) {
+  .form-grid, .form-grid.three { grid-template-columns: 1fr; }
+  .charts-row { grid-template-columns: 1fr; }
+  .record-body-grid { grid-column: 1fr; }
+  .nav-btn { padding: 10px 12px; font-size: 9px; letter-spacing: 0.1em; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-texture"></div>
+<div class="bg-vignette"></div>
+
+<div class="content">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-title-block">
+        <div class="header-eyebrow">Age of Darkness · Legiones Astartes</div>
+        <div class="header-title">Heresy Battle Records</div>
+      </div>
+      <div class="header-skull">☠</div>
+      <button class="btn btn-secondary btn-sm" onclick="openConfig()">⚙ Configure</button>
+    </div>
+    <nav class="nav">
+      <div style="max-width:1100px;margin:0 auto;padding:0 24px;display:flex;">
+        <button class="nav-btn active" data-tab="records" onclick="switchTab('records')">Battle Records</button>
+        <button class="nav-btn" data-tab="log" onclick="switchTab('log')">Log Battle</button>
+        <button class="nav-btn" data-tab="stats" onclick="switchTab('stats')">War Statistics</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="main">
+    <!-- CONFIG BANNER -->
+    <div class="config-banner" id="configBanner">
+      <div class="config-banner-text">
+        <strong>⚠ Cogitator Uncalibrated</strong><br/>
+        Configure your Google Sheets connection to begin recording the wars of the Horus Heresy.
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="openConfig()">Open Config</button>
+    </div>
+
+    <!-- RECORDS TAB -->
+    <div id="tab-records">
+      <div class="section-header">
+        <div class="section-eyebrow">Liber Bellum</div>
+        <div class="section-title">Battle Records</div>
+        <div class="section-rule"></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label class="form-label" style="white-space:nowrap">Filter by My Legion</label>
+          <select class="form-select" id="filterArmy" onchange="renderRecords()" style="width:auto;min-width:180px">
+            <option value="">All Legions</option>
+          </select>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="fetchRecords()" id="refreshBtn" disabled>↻ Refresh</button>
+      </div>
+      <div id="recordsLoading" class="loading hidden"><div class="loading-spinner"></div><span>Consulting the war-scrolls…</span></div>
+      <div id="recordsList"></div>
+    </div>
+
+    <!-- LOG TAB -->
+    <div id="tab-log" class="hidden">
+      <div class="section-header">
+        <div class="section-eyebrow">Record of Combat</div>
+        <div class="section-title">Log Battle Report</div>
+        <div class="section-rule"></div>
+      </div>
+
+      <div id="emblemPreview" style="display:none; align-items:center; justify-content:center; gap:32px; padding:20px 0 24px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div id="prev-myArmy"></div>
+          <div id="prev-myArmy-name" style="font-family:var(--font-heading);font-size:9px;letter-spacing:0.2em;color:var(--text-dim);text-transform:uppercase;text-align:center;max-width:120px"></div>
+        </div>
+        <div style="font-family:var(--font-display);font-size:22px;color:var(--gold-dark);text-shadow:0 0 20px rgba(201,168,76,0.2)">vs</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div id="prev-opponentArmy"></div>
+          <div id="prev-opponentArmy-name" style="font-family:var(--font-heading);font-size:9px;letter-spacing:0.2em;color:var(--text-dim);text-transform:uppercase;text-align:center;max-width:120px"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Engagement Details</div>
+        <div class="form-grid three">
+          <div class="form-field">
+            <label class="form-label" id="lbl-myArmy">My Legion *</label>
+            <select class="form-select" id="f-myArmy" onchange="clearError(this); updateEmblemPreview()"><option value="">Select legion…</option></select>
+          </div>
+          <div class="form-field">
+            <label class="form-label" id="lbl-opponentArmy">Enemy Force *</label>
+            <select class="form-select" id="f-opponentArmy" onchange="clearError(this); updateEmblemPreview()"><option value="">Select force…</option></select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Points Limit *</label>
+            <input class="form-input" type="number" placeholder="e.g. 3000" id="f-points" oninput="clearError(this)"/>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Mission *</label>
+            <input class="form-input" id="f-mission" placeholder="e.g. Annihilation, Zone Mortalis…" oninput="clearError(this)"/>
+          </div>
+          <div class="form-field form-col-full">
+            <label class="form-label">Mission Details *</label>
+            <textarea class="form-textarea" id="f-missionDetails" style="min-height:70px" placeholder="Describe the mission parameters, deployment, special rules…" oninput="clearError(this)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Outcome</div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="form-label">Result *</label>
+            <div class="radio-group">
+              <div class="radio-option victory"><input type="radio" id="r-Victory" name="myResult" value="Victory" onchange="clearRadioError(this)"/><label for="r-Victory" class="radio-label">Victory</label></div>
+              <div class="radio-option"><input type="radio" id="r-Draw" name="myResult" value="Draw" onchange="clearRadioError(this)"/><label for="r-Draw" class="radio-label">Draw</label></div>
+              <div class="radio-option"><input type="radio" id="r-Defeat" name="myResult" value="Defeat" onchange="clearRadioError(this)"/><label for="r-Defeat" class="radio-label">Defeat</label></div>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Victor (player name / legion) *</label>
+            <input class="form-input" id="f-winner" placeholder="Who claimed victory?" oninput="clearError(this)"/>
+          </div>
+          <div class="form-field form-col-full">
+            <label class="form-label">Battle Highlights *</label>
+            <textarea class="form-textarea" id="f-highlights" placeholder="Glorious moments, decisive manoeuvres, treacherous betrayals…" oninput="clearError(this)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Warlord Report</div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="form-label">Warlord Name *</label>
+            <input class="form-input" id="f-warlordName" placeholder="Name or title" oninput="clearError(this)"/>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Warlord Slain? *</label>
+            <div class="radio-group">
+              <div class="radio-option"><input type="radio" id="wd-Yes" name="warlordDied" value="Yes" onchange="toggleWarlordHow(); clearRadioError(this)"/><label for="wd-Yes" class="radio-label">Yes</label></div>
+              <div class="radio-option"><input type="radio" id="wd-No" name="warlordDied" value="No" checked onchange="toggleWarlordHow(); clearRadioError(this)"/><label for="wd-No" class="radio-label">No</label></div>
+            </div>
+          </div>
+          <div class="form-field form-col-full hidden" id="warlordHowField">
+            <label class="form-label">How did the Warlord die? *</label>
+            <input class="form-input" id="f-warlordHow" placeholder="Fell to bolter fire, crushed underfoot, slain in a challenge…" oninput="clearError(this)"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Battle Imagery</div>
+        <div class="form-field">
+          <label class="form-label">Google Drive Image IDs or URLs (comma-separated)</label>
+          <textarea class="form-textarea" id="f-images" style="min-height:70px" placeholder="1aBcDeF_xyz, 2GhIjKl_uvw  or  https://drive.google.com/…"></textarea>
+        </div>
+      </div>
+
+      <div class="flex-end">
+        <button class="btn btn-primary" id="saveBtn" onclick="saveRecord()" disabled>⚔ Record Battle</button>
+      </div>
+    </div>
+
+    <!-- STATS TAB -->
+    <div id="tab-stats" class="hidden">
+      <div class="section-header">
+        <div class="section-eyebrow">Strategium Reports</div>
+        <div class="section-title">War Statistics</div>
+        <div class="section-rule"></div>
+      </div>
+      <div id="statsLoading" class="loading hidden"><div class="loading-spinner"></div><span>Calculating the butcher's bill…</span></div>
+      <div id="statsContent"></div>
+    </div>
+  </main>
+</div>
+
+<!-- CONFIG MODAL -->
+<div class="modal-backdrop hidden" id="configModal" onclick="if(event.target===this && isConfigured())closeConfig()">
+  <div class="modal">
+    <div class="modal-title">Cogitator Configuration</div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="form-field">
+        <label class="form-label">Google API Key</label>
+        <input class="form-input" type="password" id="cfg-apiKey" placeholder="AIza…"/>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Google Sheet ID</label>
+        <input class="form-input" id="cfg-sheetId" placeholder="1BxiMVs0XRA…"/>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Service Account JSON</label>
+        <textarea class="form-textarea" id="cfg-serviceJson" style="min-height:100px;font-size:12px;font-family:monospace" placeholder='{"type":"service_account","client_email":"…","private_key":"…"}'></textarea>
+      </div>
+      <div class="note-box">
+        Sheet tab must be named <strong style="color:var(--gold-dark)">Heresy_Battle_Record</strong> with columns:<br/>
+        <span style="color:var(--parchment-dark);font-size:11px">Timestamp, MyArmy, OpponentArmy, Points, Mission, MissionDetails, Winner, MyResult, Highlights, WarlordDied, WarlordHow, WarlordName, Images</span>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end">
+        <button class="btn btn-secondary btn-sm" id="cancelCfgBtn" onclick="closeConfig()" style="display:none">Cancel</button>
+        <button class="btn btn-primary" onclick="applyConfig()">Link Cogitator</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="handleLightboxClick(event)">
+  <button class="lightbox-btn lightbox-prev" onclick="event.stopPropagation(); lightboxNav(-1)">&#8249;</button>
+  <img id="lightboxImg" src="" alt="Battle record"/>
+  <button class="lightbox-btn lightbox-next" onclick="event.stopPropagation(); lightboxNav(1)">&#8250;</button>
+  <button class="lightbox-close" onclick="event.stopPropagation(); closeLightbox()">&#x2715;</button>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const LEGIONS = [
+  "Dark Angels","Emperor's Children","Iron Warriors","White Scars",
+  "Space Wolves","Imperial Fists","Night Lords","Blood Angels",
+  "Iron Hands","World Eaters","Ultramarines","Death Guard",
+  "Thousand Sons","Sons of Horus","Word Bearers","Salamanders",
+  "Raven Guard","Alpha Legion","Solar Auxilia","Mechanicum",
+  "Imperial Army","Legio Custodes","Blackshields","Shattered Legions",
+  "Daemons of the Ruinstorm"
+];
+
+const MISSIONS = [
+  "Annihilation","Dominion","Retrieval","Decapitation Strike",
+  "Tide of Carnage","Last Stand","Breakthrough","Ambush",
+  "Zone Mortalis","Purge the Enemy","The Long March","Clash of Champions",
+  "Custom Mission"
+];
+
+const PIE_COLORS = ["#c9a84c","#8b1a1a","#4a7a8a","#6b8a4a","#7a4a8a","#8a6a2a","#4a4a8a","#8a4a4a","#4a8a6a","#8a7a4a","#5a4a7a","#7a5a4a"];
+const COLS = ["Timestamp","MyArmy","OpponentArmy","Points","Mission","MissionDetails","Winner","MyResult","Highlights","WarlordDied","WarlordHow","WarlordName","Images"];
+
+let cfg = { apiKey: "", sheetId: "", serviceJson: "" };
+let allRecords = [];
+let currentTab = "records";
+let toastTimer = null;
+
+// ── INIT ──
+(function init() {
+  const legionSels = [document.getElementById("f-myArmy"), document.getElementById("f-opponentArmy")];
+  LEGIONS.forEach(l => {
+    legionSels.forEach(sel => { const o = document.createElement("option"); o.value = o.textContent = l; sel.appendChild(o); });
+  });
+  const mSel = document.getElementById("f-mission");
+  if (mSel && mSel.tagName === "SELECT") {
+    MISSIONS.forEach(m => { const o = document.createElement("option"); o.value = o.textContent = m; mSel.appendChild(o); });
+  }
+
+  // Load saved credentials from localStorage
+  const saved = localStorage.getItem("heresy_cfg");
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed.apiKey && parsed.sheetId && parsed.serviceJson) {
+        cfg = parsed;
+        document.getElementById("configBanner").classList.add("hidden");
+        document.getElementById("refreshBtn").disabled = false;
+        document.getElementById("saveBtn").disabled = false;
+        fetchRecords();
+        return;
+      }
+    } catch(e) { localStorage.removeItem("heresy_cfg"); }
+  }
+  openConfig();
+})();
+
+// ── UTILS ──
+function $(id) { return document.getElementById(id); }
+
+function showToast(msg, type = "success") {
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = `toast show toast-${type}`;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = "toast"; }, 3500);
+}
+
+function isConfigured() { return cfg.apiKey && cfg.sheetId && cfg.serviceJson; }
+
+function updateEmblemPreview() {
+  const myArmy = $("f-myArmy").value;
+  const opArmy = $("f-opponentArmy").value;
+  const preview = $("emblemPreview");
+  const myUrl = LEGION_EMBLEMS[myArmy];
+  const opUrl = LEGION_EMBLEMS[opArmy];
+  if (!myUrl && !opUrl) { preview.style.display = "none"; return; }
+  preview.style.display = "flex";
+  $("prev-myArmy").innerHTML = myUrl ? `<img src="${myUrl}" width="80" height="80" style="border-radius:50%;object-fit:cover;" alt="${myArmy}"/>` : "";
+  $("prev-myArmy-name").textContent = myArmy || "";
+  $("prev-opponentArmy").innerHTML = opUrl ? `<img src="${opUrl}" width="80" height="80" style="border-radius:50%;object-fit:cover;" alt="${opArmy}"/>` : "";
+  $("prev-opponentArmy-name").textContent = opArmy || "";
+}
+
+function clearError(el) { el.previousElementSibling.classList.remove("error"); }
+
+function updateEmblemPreview() {
+  const myArmy = $("f-myArmy").value;
+  const opArmy = $("f-opponentArmy").value;
+  const preview = $("emblemPreview");
+  const myHasEmblem = myArmy && LEGION_EMBLEMS[myArmy];
+  const opHasEmblem = opArmy && LEGION_EMBLEMS[opArmy];
+  if (!myHasEmblem && !opHasEmblem) { preview.style.display = "none"; return; }
+  preview.style.display = "flex";
+  $("prev-myArmy").innerHTML = myArmy ? legionEmblem(myArmy, 90) : "";
+  $("prev-myArmy-name").textContent = myArmy || "";
+  $("prev-opponentArmy").innerHTML = opArmy ? legionEmblem(opArmy, 90) : "";
+  $("prev-opponentArmy-name").textContent = opArmy || "";
+}
+function clearRadioError(el) {
+  const group = el.closest(".radio-group");
+  group.classList.remove("error");
+  group.previousElementSibling.classList.remove("error");
+}
+
+function toggleWarlordHow() {
+  const yes = $("wd-Yes").checked;
+  $("warlordHowField").classList.toggle("hidden", !yes);
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  ["records","log","stats"].forEach(t => $(`tab-${t}`).classList.toggle("hidden", t !== tab));
+  if (tab === "records" && isConfigured() && allRecords.length === 0) fetchRecords();
+  if (tab === "stats" && isConfigured()) { if (allRecords.length === 0) fetchRecords(true); else renderStats(); }
+}
+
+// ── CONFIG ──
+function openConfig() {
+  $("cfg-apiKey").value = cfg.apiKey;
+  $("cfg-sheetId").value = cfg.sheetId;
+  $("cfg-serviceJson").value = cfg.serviceJson;
+  $("cancelCfgBtn").style.display = isConfigured() ? "inline-flex" : "none";
+  $("configModal").classList.remove("hidden");
+}
+
+function closeConfig() { $("configModal").classList.add("hidden"); }
+
+function applyConfig() {
+  const apiKey = $("cfg-apiKey").value.trim();
+  const sheetId = $("cfg-sheetId").value.trim();
+  const serviceJson = $("cfg-serviceJson").value.trim();
+  if (!apiKey || !sheetId || !serviceJson) { showToast("All fields required", "error"); return; }
+  try { JSON.parse(serviceJson); } catch { showToast("Invalid service account JSON", "error"); return; }
+  cfg = { apiKey, sheetId, serviceJson };
+  localStorage.setItem("heresy_cfg", JSON.stringify(cfg));
+  $("configBanner").classList.add("hidden");
+  $("refreshBtn").disabled = false;
+  $("saveBtn").disabled = false;
+  closeConfig();
+  fetchRecords();
+}
+
+// ── AUTH ──
+async function getAccessToken() {
+  const sa = JSON.parse(cfg.serviceJson);
+  const enc = obj => btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).replace(/=/g,"").replace(/\+/g,"-").replace(/\//g,"_");
+  const now = Math.floor(Date.now() / 1000);
+  const header = { alg: "RS256", typ: "JWT" };
+  const claim = { iss: sa.client_email, scope: "https://www.googleapis.com/auth/spreadsheets", aud: "https://oauth2.googleapis.com/token", iat: now, exp: now + 3600 };
+  const sigInput = `${enc(header)}.${enc(claim)}`;
+  const pem = sa.private_key.replace(/-----[^-]+-----/g,"").replace(/\s+/g,"");
+  const keyBin = Uint8Array.from(atob(pem), c => c.charCodeAt(0));
+  const key = await crypto.subtle.importKey("pkcs8", keyBin.buffer, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
+  const sig = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key, new TextEncoder().encode(sigInput));
+  const sigB64 = btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/=/g,"").replace(/\+/g,"-").replace(/\//g,"_");
+  const jwt = `${sigInput}.${sigB64}`;
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`
+  });
+  const data = await res.json();
+  if (!data.access_token) throw new Error("Auth failed");
+  return data.access_token;
+}
+
+// ── FETCH ──
+async function fetchRecords(forStats = false) {
+  if (!isConfigured()) return;
+  const loadEl = forStats ? $("statsLoading") : $("recordsLoading");
+  loadEl.classList.remove("hidden");
+  if (!forStats) $("recordsList").innerHTML = "";
+  try {
+    const token = await getAccessToken();
+    const range = encodeURIComponent("Heresy_Battle_Record!A2:M");
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${range}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    allRecords = (data.values || []).map((row, i) => {
+      const r = { _index: i };
+      COLS.forEach((c, ci) => { r[c] = row[ci] || ""; });
+      return r;
+    }).sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
+    if (forStats || currentTab === "stats") renderStats();
+    if (!forStats || currentTab === "records") renderRecords();
+  } catch(e) {
+    showToast("Failed to fetch: " + e.message, "error");
+  }
+  loadEl.classList.add("hidden");
+}
+
+// ── SAVE ──
+async function saveRecord() {
+  const myArmy = $("f-myArmy").value;
+  const opponentArmy = $("f-opponentArmy").value;
+  const points = $("f-points").value.trim();
+  const mission = $("f-mission").value.trim();
+  const missionDetails = $("f-missionDetails").value.trim();
+  const myResult = document.querySelector('input[name="myResult"]:checked')?.value || "";
+  const winner = $("f-winner").value.trim();
+  const highlights = $("f-highlights").value.trim();
+  const warlordName = $("f-warlordName").value.trim();
+  const warlordDied = document.querySelector('input[name="warlordDied"]:checked')?.value || "";
+  const warlordHow = $("f-warlordHow").value.trim();
+
+  // Clear previous errors
+  document.querySelectorAll(".form-label.error").forEach(el => el.classList.remove("error"));
+  document.querySelectorAll(".radio-group.error").forEach(el => el.classList.remove("error"));
+
+  const err = el => { el.previousElementSibling.classList.add("error"); hasError = true; };
+  const errRadio = name => {
+    const group = document.querySelector(`[name="${name}"]`).closest(".radio-group");
+    group.previousElementSibling.classList.add("error");
+    group.classList.add("error");
+    hasError = true;
+  };
+
+  let hasError = false;
+  if (!myArmy) err($("f-myArmy"));
+  if (!opponentArmy) err($("f-opponentArmy"));
+  if (!points) err($("f-points"));
+  if (!mission) err($("f-mission"));
+  if (!missionDetails) err($("f-missionDetails"));
+  if (!myResult) errRadio("myResult");
+  if (!winner) err($("f-winner"));
+  if (!highlights) err($("f-highlights"));
+  if (!warlordName) err($("f-warlordName"));
+  if (!warlordDied) errRadio("warlordDied");
+  if (warlordDied === "Yes" && !warlordHow) err($("f-warlordHow"));
+  if (hasError) return;
+  const btn = $("saveBtn");
+  btn.disabled = true; btn.textContent = "Etching into the annals…";
+  try {
+    const token = await getAccessToken();
+    const warlordDied = document.querySelector('input[name="warlordDied"]:checked')?.value || "No";
+    const row = [
+      new Date().toISOString(), myArmy, opponentArmy,
+      $("f-points").value, mission, $("f-missionDetails").value,
+      $("f-winner").value, myResult, $("f-highlights").value,
+      warlordDied, $("f-warlordHow").value, $("f-warlordName").value, $("f-images").value
+    ];
+    const range = encodeURIComponent("Heresy_Battle_Record!A:M");
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${range}:append?valueInputOption=USER_ENTERED`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ values: [row] })
+    });
+    if (!res.ok) throw new Error("Sheet write failed");
+    showToast("Battle record etched into the annals of war");
+    // Reset form
+    ["f-myArmy","f-opponentArmy","f-mission"].forEach(id => $(id).value = "");
+    ["f-points","f-missionDetails","f-winner","f-highlights","f-warlordHow","f-warlordName","f-images"].forEach(id => $(id).value = "");
+    document.querySelectorAll('input[name="myResult"]').forEach(r => r.checked = false);
+    $("wd-No").checked = true;
+    $("warlordHowField").classList.add("hidden");
+    allRecords = [];
+  } catch(e) {
+    showToast("Failed to save: " + e.message, "error");
+  }
+  btn.disabled = false; btn.textContent = "⚔ Record Battle";
+}
+
+// ── RENDER RECORDS ──
+function getImageUrls(imgStr) {
+  if (!imgStr) return [];
+  return imgStr.split(",").map(s => s.trim()).filter(Boolean).map(entry => {
+    // Extract ID from full Drive share URL: /file/d/{ID}/view
+    const match = entry.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    const id = match ? match[1] : entry;
+    return `https://wsrv.nl/?url=https://drive.google.com/uc?id=${id}`;
+  });
+}
+
+function renderRecords() {
+  const el = $("recordsList");
+  const filterSel = $("filterArmy");
+
+  // Populate filter options from unique MyArmy values
+  const currentFilter = filterSel ? filterSel.value : "";
+  if (filterSel) {
+    const armies = [...new Set(allRecords.map(r => r.MyArmy).filter(Boolean))].sort();
+    filterSel.innerHTML = `<option value="">All Legions</option>` + armies.map(a => `<option value="${a}" ${a === currentFilter ? "selected" : ""}>${a}</option>`).join("");
+  }
+
+  // Apply filter
+  const filtered = currentFilter ? allRecords.filter(r => r.MyArmy === currentFilter) : allRecords;
+
+  if (filtered.length === 0) {
+    el.innerHTML = allRecords.length === 0
+      ? `<div class="empty-state"><div class="empty-state-icon">⚔</div><div class="empty-state-text">No battles recorded yet. The war awaits.</div></div>`
+      : `<div class="empty-state"><div class="empty-state-icon">⚔</div><div class="empty-state-text">No records match this legion.</div></div>`;
+    return;
+  }
+
+  el.innerHTML = filtered.map((rec, i) => {
+    const num = allRecords.length - allRecords.indexOf(rec);
+    const resultClass = rec.MyResult === "Victory" ? "tag-victory" : rec.MyResult === "Defeat" ? "tag-defeat" : "tag-draw";
+    const warlordTag = rec.WarlordDied === "Yes" ? `<span class="tag tag-warlord-dead">Warlord Slain</span>` : "";
+    const date = rec.Timestamp ? rec.Timestamp.split("T")[0] : "";
+    const pts = rec.Points ? ` · ${rec.Points}pts` : "";
+    const imgs = getImageUrls(rec.Images);
+    const recIdx = allRecords.indexOf(rec);
+    const imgHtml = imgs.length > 0
+      ? `<div class="record-images">${imgs.map((url, j) => `<img src="${url}" class="record-img" onclick="openLightboxForRecord(${recIdx}, ${j})" onerror="this.style.display='none'" alt="Battle"/>`).join("")}</div>`
+      : "";
+    const highlightHtml = rec.Highlights
+      ? `<div class="record-highlight"><div class="record-field-label" style="margin-bottom:6px">Battle Highlights</div>${escHtml(rec.Highlights)}</div>`
+      : "";
+    const warlordInfo = rec.WarlordName
+      ? `<div><div class="record-field-label">Warlord</div><div class="record-field-value">${escHtml(rec.WarlordName)} — ${rec.WarlordDied==="Yes"?`Slain (${escHtml(rec.WarlordHow||"unknown")})`:"Survived"}</div></div>`
+      : "";
+    const missionDetail = rec.MissionDetails
+      ? `<div><div class="record-field-label">Mission Details</div><div class="record-field-value" style="font-size:14px;color:var(--text-secondary)">${escHtml(rec.MissionDetails)}</div></div>`
+      : "";
+    const winnerHtml = rec.Winner
+      ? `<div><div class="record-field-label">Victor</div><div class="record-field-value">${escHtml(rec.Winner)}</div></div>`
+      : "";
+    return `
+      <div class="record-card">
+        <div class="record-header" onclick="toggleRecord(${allRecords.indexOf(rec)})">
+          <div class="record-header-left">
+            <div class="record-number">#${num}</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              ${legionEmblem(rec.MyArmy, 60)}
+              <div>
+                <div class="record-mission">${escHtml(rec.Mission || "Unknown Mission")}</div>
+                <div class="record-meta">${escHtml(rec.MyArmy)} vs ${escHtml(rec.OpponentArmy)}${pts}${date ? ` · ${date}` : ""}</div>
+              </div>
+            </div>
+          </div>
+          <div class="record-tags">
+            <span class="tag ${resultClass}">${rec.MyResult || "?"}</span>
+            ${warlordTag}
+            <span class="record-chevron" id="chev-${allRecords.indexOf(rec)}">▶</span>
+          </div>
+        </div>
+        <div class="record-body" id="body-${allRecords.indexOf(rec)}">
+          <div class="record-body-grid">
+            <div><div class="record-field-label">My Legion</div><div class="record-field-value" style="display:flex;align-items:center;gap:8px">${legionEmblem(rec.MyArmy, 104)}${escHtml(rec.MyArmy)}</div></div>
+            <div><div class="record-field-label">Enemy Force</div><div class="record-field-value" style="display:flex;align-items:center;gap:8px">${legionEmblem(rec.OpponentArmy, 104)}${escHtml(rec.OpponentArmy)}</div></div>
+            ${winnerHtml}${missionDetail}${warlordInfo}
+          </div>
+          ${highlightHtml}${imgHtml}
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function toggleRecord(i) {
+  const body = $(`body-${i}`);
+  const chev = $(`chev-${i}`);
+  const header = body.previousElementSibling;
+  const open = body.classList.toggle("open");
+  chev.classList.toggle("open", open);
+  header.classList.toggle("open", open);
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ── LIGHTBOX ──
+let lightboxImages = [];
+let lightboxIndex = 0;
+
+function openLightboxForRecord(recIdx, imgIdx) {
+  const rec = allRecords[recIdx];
+  if (!rec) return;
+  const urls = getImageUrls(rec.Images);
+  openLightbox(urls[imgIdx], urls);
+}
+
+function openLightbox(url, allUrls) {
+  lightboxImages = allUrls || [url];
+  lightboxIndex = lightboxImages.indexOf(url);
+  if (lightboxIndex === -1) lightboxIndex = 0;
+  updateLightbox();
+  $("lightbox").classList.add("open");
+}
+
+function updateLightbox() {
+  $("lightboxImg").src = lightboxImages[lightboxIndex];
+  $("lightboxCounter").textContent = lightboxImages.length > 1 ? `${lightboxIndex + 1} / ${lightboxImages.length}` : "";
+  document.querySelector(".lightbox-prev").classList.toggle("hidden", lightboxImages.length <= 1);
+  document.querySelector(".lightbox-next").classList.toggle("hidden", lightboxImages.length <= 1);
+}
+
+function lightboxNav(dir) {
+  lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length;
+  updateLightbox();
+}
+
+function handleLightboxClick(e) {
+  if (e.target === $("lightbox")) closeLightbox();
+}
+
+function closeLightbox() { $("lightbox").classList.remove("open"); }
+
+document.addEventListener("keydown", e => {
+  if (!$("lightbox").classList.contains("open")) return;
+  if (e.key === "ArrowRight") lightboxNav(1);
+  if (e.key === "ArrowLeft") lightboxNav(-1);
+  if (e.key === "Escape") closeLightbox();
+});
+
+// ── STATS ──
+function renderStats() {
+  const el = $("statsContent");
+  if (allRecords.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📜</div><div class="empty-state-text">No data to calculate. Log your first battle.</div></div>`;
+    return;
+  }
+  const total = allRecords.length;
+  const wins = allRecords.filter(r => r.MyResult === "Victory").length;
+  const losses = allRecords.filter(r => r.MyResult === "Defeat").length;
+  const draws = allRecords.filter(r => r.MyResult === "Draw").length;
+  const warlordDeaths = allRecords.filter(r => r.WarlordDied === "Yes").length;
+  const winPct = Math.round((wins / total) * 100);
+  const survivalPct = Math.round(((total - warlordDeaths) / total) * 100);
+
+  const armyCount = {};
+  allRecords.forEach(r => { if (r.MyArmy) armyCount[r.MyArmy] = (armyCount[r.MyArmy] || 0) + 1; });
+  const armyData = Object.entries(armyCount).map(([name, value]) => ({ name, value })).sort((a,b)=>b.value-a.value);
+
+  const opponentMap = {};
+  allRecords.forEach(r => {
+    if (!r.OpponentArmy) return;
+    if (!opponentMap[r.OpponentArmy]) opponentMap[r.OpponentArmy] = { played: 0, won: 0 };
+    opponentMap[r.OpponentArmy].played++;
+    if (r.MyResult === "Victory") opponentMap[r.OpponentArmy].won++;
+  });
+
+  const warlordMap = {};
+  allRecords.forEach(r => {
+    if (!r.WarlordName) return;
+    if (!warlordMap[r.WarlordName]) warlordMap[r.WarlordName] = { games: 0, survived: 0 };
+    warlordMap[r.WarlordName].games++;
+    if (r.WarlordDied !== "Yes") warlordMap[r.WarlordName].survived++;
+  });
+  const bestWarlord = Object.entries(warlordMap).sort((a,b)=>(b[1].survived/b[1].games)-(a[1].survived/a[1].games))[0];
+
+  const winColor = winPct >= 50 ? "#7dc64a" : "var(--blood-light)";
+  const survColor = survivalPct >= 60 ? "#7dc64a" : "var(--blood-light)";
+
+  const bestWarlordCard = bestWarlord ? `
+    <div class="stat-card">
+      <div class="stat-value" style="font-size:18px;padding-top:6px">${escHtml(bestWarlord[0])}</div>
+      <div class="stat-label">Most Resilient Warlord</div>
+      <div class="stat-sub">${bestWarlord[1].survived}/${bestWarlord[1].games} survived</div>
+    </div>` : "";
+
+  const opRows = Object.entries(opponentMap).sort((a,b)=>b[1].played-a[1].played).map(([name,d]) => {
+    const pct = Math.round((d.won / d.played) * 100);
+    const status = d.won > d.played - d.won ? `<span class="tag tag-victory">Dominant</span>` : d.won === d.played - d.won ? `<span class="tag tag-draw">Even</span>` : `<span class="tag tag-defeat">Struggling</span>`;
+    return `<tr><td class="td-strong"><div style="display:flex;align-items:center;gap:8px">${legionEmblem(name,44)}${escHtml(name)}</div></td><td>${d.played}</td><td class="td-victory">${d.won}</td><td style="color:${pct>=50?"#7dc64a":"var(--blood-light)"}">${pct}%</td><td>${status}</td></tr>`;
+  }).join("");
+
+  const warlordRows = Object.entries(warlordMap).sort((a,b)=>b[1].games-a[1].games).map(([name,d]) => {
+    const pct = Math.round((d.survived/d.games)*100);
+    return `<tr><td class="td-strong">${escHtml(name)}</td><td>${d.games}</td><td class="td-blood">${d.games-d.survived}</td><td style="color:${pct>=60?"#7dc64a":"var(--blood-light)"}">${pct}%</td></tr>`;
+  }).join("");
+
+  el.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Battles Fought</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:${winColor}">${winPct}%</div><div class="stat-label">Victory Rate</div><div class="stat-sub">${wins}W · ${draws}D · ${losses}L</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:${survColor}">${survivalPct}%</div><div class="stat-label">Warlord Survival</div><div class="stat-sub">${warlordDeaths} slain in battle</div></div>
+      ${bestWarlordCard}
+    </div>
+    <div class="charts-row">
+      <div class="chart-panel"><div class="chart-title">Legions Deployed</div><div id="pie-armies"></div></div>
+      <div class="chart-panel"><div class="chart-title">Battle Outcomes</div><div id="pie-outcomes"></div></div>
+    </div>
+    <div class="divider">Enemies of the Imperium</div>
+    <div class="panel">
+      <div class="panel-title">Foes Faced &amp; Felled</div>
+      <table class="data-table"><thead><tr><th>Enemy Force</th><th>Engagements</th><th>Victories</th><th>Win Rate</th><th>Status</th></tr></thead><tbody>${opRows}</tbody></table>
+    </div>
+    ${warlordRows ? `<div class="panel mt-20"><div class="panel-title">Warlord Dossier</div><table class="data-table"><thead><tr><th>Warlord</th><th>Battles</th><th>Times Slain</th><th>Survival Rate</th></tr></thead><tbody>${warlordRows}</tbody></table></div>` : ""}
+  `;
+
+  drawPie("pie-armies", armyData);
+  drawPie("pie-outcomes", [
+    { name: "Victory", value: wins },
+    { name: "Draw", value: draws },
+    { name: "Defeat", value: losses },
+  ].filter(d => d.value > 0));
+}
+
+const LEGION_EMBLEMS = {
+  "Alpha Legion":              "https://wsrv.nl/?url=https://drive.google.com/uc?id=10mz9lmq-15HD4AyaI7GXuX1CQRW6NYaT",
+  "World Eaters":              "https://wsrv.nl/?url=https://drive.google.com/uc?id=1nWV-rUkEpNiZjT7_ZTcX1kw9lZAwbmm1",
+  "Blackshields":              "https://wsrv.nl/?url=https://drive.google.com/uc?id=1cHfSjHZXUJCUQNmflhP_lbZ55HD4mF24",
+  "Blood Angels":              "https://wsrv.nl/?url=https://drive.google.com/uc?id=1GhYxiAHr3Y5BsMcosnCjNAs0dDwa4aZz",
+  "Daemons of the Ruinstorm": "https://wsrv.nl/?url=https://drive.google.com/uc?id=1AyKqwOmBEnUM-zWZ3Gtc7n55yZCTd9fJ",
+  "Dark Angels":               "https://wsrv.nl/?url=https://drive.google.com/uc?id=12kyKSrU3Olnh-CGAMEalOeVbnbKPTb05",
+  "Death Guard":               "https://wsrv.nl/?url=https://drive.google.com/uc?id=1xvEFyFZW-s8HZwr-qK6l-RyKfthVWpN9",
+  "Emperor's Children":        "https://wsrv.nl/?url=https://drive.google.com/uc?id=1O3XYWi0EaZs5ZZ4bSUgfLWbx1jUggtKu",
+  "Imperial Army":             "https://wsrv.nl/?url=https://drive.google.com/uc?id=1vgXEEcw_i7kjZNxkyCH69TBaGT1R4f7f",
+  "Imperial Fists":            "https://wsrv.nl/?url=https://drive.google.com/uc?id=1nWbZVqaI1eJDrcAu3_HmV8dyLsLLTPRB",
+  "Iron Hands":                "https://wsrv.nl/?url=https://drive.google.com/uc?id=1ysCrVyKcPV7Ot8IzoHqRdVAzYnf5udz6",
+  "Iron Warriors":             "https://wsrv.nl/?url=https://drive.google.com/uc?id=1HOrDCOiMjYzcEo0E3631P9srd-IdYFY2",
+  "Legio Custodes":            "https://wsrv.nl/?url=https://drive.google.com/uc?id=1HMxLAcdEfrBkkLO9VDwhvfd7C11X6TdH",
+  "Mechanicum":                "https://wsrv.nl/?url=https://drive.google.com/uc?id=1Puejk0kyBzCEa3XRTvHDX7qYIpqTax6e",
+  "Night Lords":               "https://wsrv.nl/?url=https://drive.google.com/uc?id=15zRLgGz2Y84x_9tKtiJym9MxSHazPuN8",
+  "Raven Guard":               "https://wsrv.nl/?url=https://drive.google.com/uc?id=1bww94aNvnXJiv_btdR1igpP2TQt02jhD",
+  "Salamanders":               "https://wsrv.nl/?url=https://drive.google.com/uc?id=1hu8gjfqJPGYZsob7ujIDmBN7ff6Yu-OP",
+  "Shattered Legions":         "https://wsrv.nl/?url=https://drive.google.com/uc?id=13v0LG_nt2ABvrfk5gL8QqzwD30CzI77-",
+  "Solar Auxilia":             "https://wsrv.nl/?url=https://drive.google.com/uc?id=1Y9zQzTKrJdvUQqV5N_qRnk0mGkdJqtqU",
+  "Sons of Horus":             "https://wsrv.nl/?url=https://drive.google.com/uc?id=1fmAO-fRmMi7ZmfI7ESezf2QujQw-lier",
+  "Space Wolves":              "https://wsrv.nl/?url=https://drive.google.com/uc?id=1zcenhEvGSS_wS374_FnMegwOP3JYWgaW",
+  "Thousand Sons":             "https://wsrv.nl/?url=https://drive.google.com/uc?id=12m-XubPXhIbpbKu6IwxPX3Lfcyxe-Wji",
+  "Ultramarines":              "https://wsrv.nl/?url=https://drive.google.com/uc?id=1dJkIuN8cces0pokyWRnHv6LtHkRA_QM8",
+  "White Scars":               "https://wsrv.nl/?url=https://drive.google.com/uc?id=1peN6yOtAEYZmggltgrtLG6puzxauTOC1",
+  "Word Bearers":              "https://wsrv.nl/?url=https://drive.google.com/uc?id=1DYkzlg561ZasNd-kSY_jwbQ2Cql_dfvu",
+};
+
+function legionEmblem(name, size = 32) {
+  const url = LEGION_EMBLEMS[name];
+  if (url) {
+    return `<img src="${url}" width="${size}" height="${size}" style="display:inline-block;vertical-align:middle;flex-shrink:0;object-fit:contain;" onerror="this.style.display='none'" alt="${name}"/>`;
+  }
+  return "";
+}
+
+function drawPie(containerId, data) {
+  const el = $(containerId);
+  if (!el || !data || data.length === 0) return;
+  const total = data.reduce((s,d) => s + d.value, 0);
+  if (total === 0) return;
+  const cx = 70, cy = 70, r = 60;
+  let angle = -Math.PI / 2;
+  const slices = data.map((d, i) => {
+    const slice = (d.value / total) * 2 * Math.PI;
+    const x1 = cx + r * Math.cos(angle);
+    const y1 = cy + r * Math.sin(angle);
+    angle += slice;
+    const x2 = cx + r * Math.cos(angle);
+    const y2 = cy + r * Math.sin(angle);
+    const large = slice > Math.PI ? 1 : 0;
+    return { path: `M ${cx} ${cy} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`, color: PIE_COLORS[i % PIE_COLORS.length], name: d.name, value: d.value };
+  });
+
+  const legend = data.map((d, i) =>
+    `<div class="pie-legend-item"><div class="pie-dot" style="background:${PIE_COLORS[i % PIE_COLORS.length]}"></div><span>${escHtml(d.name)} (${d.value})</span></div>`
+  ).join("");
+
+  el.innerHTML = `<div class="pie-container">
+    <svg viewBox="0 0 140 140" style="width:130px;height:130px;flex-shrink:0">
+      ${slices.map(s => `<path d="${s.path}" fill="${s.color}" stroke="#1a1612" stroke-width="1.5"/>`).join("")}
+      <circle cx="${cx}" cy="${cy}" r="28" fill="#1a1612"/>
+      <text x="${cx}" y="${cy}" text-anchor="middle" dy="4" fill="#c9a84c" font-size="14" font-family="'Cinzel Decorative',serif">${total}</text>
+    </svg>
+    <div class="pie-legend">${legend}</div>
+  </div>`;
+}
+</script>
+</body>
+</html>
