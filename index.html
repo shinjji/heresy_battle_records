@@ -480,9 +480,15 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
 
       <div class="panel">
         <div class="panel-title">Battle Imagery</div>
-        <div class="form-field">
-          <label class="form-label">Google Drive Image IDs or URLs (comma-separated)</label>
-          <textarea class="form-textarea" id="f-images" style="min-height:70px" placeholder="1aBcDeF_xyz, 2GhIjKl_uvw  or  https://drive.google.com/…"></textarea>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="form-field">
+            <label class="form-label">Google Drive Image IDs or URLs (comma-separated)</label>
+            <textarea class="form-textarea" id="f-images" style="min-height:70px" placeholder="1aBcDeF_xyz, 2GhIjKl_uvw  or  https://drive.google.com/…"></textarea>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Google Drive Video IDs Or URLs (comma-separated)</label>
+            <textarea class="form-textarea" id="f-videos" style="min-height:70px"></textarea>
+          </div>
         </div>
       </div>
 
@@ -523,7 +529,7 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
       </div>
       <div class="note-box">
         Sheet tab must be named <strong style="color:var(--gold-dark)">Heresy_Battle_Record</strong> with columns:<br/>
-        <span style="color:var(--parchment-dark);font-size:11px">Timestamp, MyArmy, OpponentArmy, Points, Mission, MissionDetails, MyResult, Highlights, WarlordDied, WarlordHow, WarlordName, Images, Campaign, MyPlayers, OpponentPlayers, All_Vs_All</span>
+        <span style="color:var(--parchment-dark);font-size:11px">Timestamp, MyArmy, OpponentArmy, Points, Mission, MissionDetails, MyResult, Highlights, WarlordDied, WarlordHow, WarlordName, Images, Campaign, MyPlayers, OpponentPlayers, All_Vs_All, Videos</span>
       </div>
       <div style="display:flex;gap:12px;justify-content:flex-end">
         <button class="btn btn-secondary btn-sm" id="cancelCfgBtn" onclick="closeConfig()" style="display:none">Cancel</button>
@@ -564,7 +570,7 @@ const MISSIONS = [
 ];
 
 const PIE_COLORS = ["#c9a84c","#8b1a1a","#4a7a8a","#6b8a4a","#7a4a8a","#8a6a2a","#4a4a8a","#8a4a4a","#4a8a6a","#8a7a4a","#5a4a7a","#7a5a4a"];
-const COLS = ["Timestamp","MyArmy","OpponentArmy","Points","Mission","MissionDetails","MyResult","Highlights","WarlordDied","WarlordHow","WarlordName","Images","Campaign","MyPlayers","OpponentPlayers","All_Vs_All"];
+const COLS = ["Timestamp","MyArmy","OpponentArmy","Points","Mission","MissionDetails","MyResult","Highlights","WarlordDied","WarlordHow","WarlordName","Images","Campaign","MyPlayers","OpponentPlayers","All_Vs_All","Videos"];
 
 let cfg = { apiKey: "", sheetId: "", serviceJson: "" };
 let allRecords = [];
@@ -773,7 +779,7 @@ async function fetchRecords(forStats = false) {
   if (!forStats) $("recordsList").innerHTML = "";
   try {
     const token = await getAccessToken();
-    const range = encodeURIComponent("Heresy_Battle_Record!A2:P");
+    const range = encodeURIComponent("Heresy_Battle_Record!A2:Q");
     const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${range}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -844,9 +850,9 @@ async function saveRecord() {
       $("f-points").value, mission, $("f-missionDetails").value,
       myResult, $("f-highlights").value,
       warlordDied, $("f-warlordHow").value, $("f-warlordName").value, $("f-images").value,
-      $("f-campaign").value.trim(), myPlayers, opponentPlayers, ""
+      $("f-campaign").value.trim(), myPlayers, opponentPlayers, "", $("f-videos").value.trim()
     ];
-    const range = encodeURIComponent("Heresy_Battle_Record!A:P");
+    const range = encodeURIComponent("Heresy_Battle_Record!A:Q");
     const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${range}:append?valueInputOption=USER_ENTERED`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -856,7 +862,7 @@ async function saveRecord() {
     showToast("Battle record etched into the annals of war");
     // Reset form
     ["f-myArmy","f-opponentArmy","f-mission"].forEach(id => $(id).value = "");
-    ["f-points","f-missionDetails","f-highlights","f-warlordHow","f-warlordName","f-images","f-campaign"].forEach(id => $(id).value = "");
+    ["f-points","f-missionDetails","f-highlights","f-warlordHow","f-warlordName","f-images","f-campaign","f-videos"].forEach(id => $(id).value = "");
     document.querySelectorAll('input[name="myResult"]').forEach(r => r.checked = false);
     $("wd-No").checked = true;
     $("warlordHowField").classList.add("hidden");
@@ -925,9 +931,19 @@ function renderRecords() {
     const pts = rec.Points ? ` · ${rec.Points}pts` : "";
     const imgs = getImageUrls(rec.Images);
     const recIdx = allRecords.indexOf(rec);
-    const imgHtml = imgs.length > 0
-      ? `<div class="record-images">${imgs.map((url, j) => `<img src="${url}" class="record-img" onclick="openLightboxForRecord(${recIdx}, ${j})" onerror="this.style.display='none'" alt="Battle"/>`).join("")}</div>`
+    const videoIds = rec.Videos ? rec.Videos.split(",").map(s => {
+      const m = s.trim().match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      return m ? m[1] : s.trim();
+    }).filter(Boolean) : [];
+    const videoButtons = videoIds.map(id => `
+      <a href="https://drive.google.com/file/d/${id}/view" target="_blank" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100px;height:75px;background:rgba(0,0,0,0.4);border:1px solid var(--border);color:var(--gold);font-family:var(--font-heading);font-size:8px;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;flex-shrink:0;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--gold-dark)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="#c9a84c" stroke-width="1"/><polygon points="9,7 19,12 9,17" fill="#c9a84c"/></svg>
+        Watch
+      </a>`).join("");
+    const imgHtml = (imgs.length > 0 || videoIds.length > 0)
+      ? `<div class="record-images">${imgs.map((url, j) => `<img src="${url}" class="record-img" onclick="openLightboxForRecord(${recIdx}, ${j})" onerror="this.style.display='none'" alt="Battle"/>`).join("")}${videoButtons}</div>`
       : "";
+    const videoHtml = "";
     const highlightHtml = rec.Highlights
       ? `<div class="record-highlight"><div class="record-field-label" style="margin-bottom:6px">Battle Highlights</div>${escHtml(rec.Highlights)}</div>`
       : "";
@@ -1054,18 +1070,29 @@ function renderStats() {
     return;
   }
   const statsRecords = allRecords.filter(r => r.All_Vs_All !== "TRUE" && r.All_Vs_All !== "true" && r.All_Vs_All !== "1");
-  const total = statsRecords.length;
+
+  // Battles Fought, Warlord Survival, Legions Deployed, Warlord Dossier — all records
+  const total = allRecords.length;
+  const warlordDeaths = allRecords.filter(r => r.WarlordDied === "Yes").length;
+  const survivalPct = Math.round(((total - warlordDeaths) / total) * 100);
+
+  // Victory Rate, Battle Outcomes — statsRecords only (excludes All_Vs_All)
   const wins = statsRecords.filter(r => r.MyResult === "Victory").length;
   const losses = statsRecords.filter(r => r.MyResult === "Defeat").length;
   const draws = statsRecords.filter(r => r.MyResult === "Draw").length;
-  const warlordDeaths = statsRecords.filter(r => r.WarlordDied === "Yes").length;
-  const winPct = Math.round((wins / total) * 100);
-  const survivalPct = Math.round(((total - warlordDeaths) / total) * 100);
+  const winPct = statsRecords.length > 0 ? Math.round((wins / statsRecords.length) * 100) : 0;
 
+  // Legions Deployed — all records
   const armyCount = {};
-  statsRecords.forEach(r => { if (r.MyArmy) armyCount[r.MyArmy] = (armyCount[r.MyArmy] || 0) + 1; });
+  allRecords.forEach(r => {
+    if (!r.MyArmy) return;
+    r.MyArmy.split(",").map(s => s.trim()).filter(Boolean).forEach(a => {
+      armyCount[a] = (armyCount[a] || 0) + 1;
+    });
+  });
   const armyData = Object.entries(armyCount).map(([name, value]) => ({ name, value })).sort((a,b)=>b.value-a.value);
 
+  // Enemies faced/felled/foes — statsRecords only (excludes All_Vs_All)
   const opponentMap = {};
   statsRecords.forEach(r => {
     if (!r.OpponentArmy) return;
@@ -1077,14 +1104,19 @@ function renderStats() {
     });
   });
 
+  // Warlord Dossier — all records
   const warlordMap = {};
-  statsRecords.forEach(r => {
+  allRecords.forEach(r => {
     if (!r.WarlordName) return;
     if (!warlordMap[r.WarlordName]) warlordMap[r.WarlordName] = { games: 0, survived: 0 };
     warlordMap[r.WarlordName].games++;
     if (r.WarlordDied !== "Yes") warlordMap[r.WarlordName].survived++;
   });
-  const bestWarlord = Object.entries(warlordMap).sort((a,b)=>(b[1].survived/b[1].games)-(a[1].survived/a[1].games))[0];
+  const bestWarlord = Object.entries(warlordMap).sort((a,b) => {
+    const scoreA = (a[1].survived / a[1].games) * Math.log10(a[1].games + 1);
+    const scoreB = (b[1].survived / b[1].games) * Math.log10(b[1].games + 1);
+    return scoreB - scoreA;
+  })[0];
 
   const winColor = winPct >= 50 ? "#7dc64a" : "var(--blood-light)";
   const survColor = survivalPct >= 60 ? "#7dc64a" : "var(--blood-light)";
@@ -1096,34 +1128,77 @@ function renderStats() {
       <div class="stat-sub">${bestWarlord[1].survived}/${bestWarlord[1].games} survived</div>
     </div>` : "";
 
-  const opRows = Object.entries(opponentMap).sort((a,b)=>b[1].played-a[1].played).map(([name,d]) => {
-    const pct = Math.round((d.won / d.played) * 100);
-    const status = d.won > d.played - d.won ? `<span class="tag tag-victory">Dominant</span>` : d.won === d.played - d.won ? `<span class="tag tag-draw">Even</span>` : `<span class="tag tag-defeat">Struggling</span>`;
-    return `<tr><td class="td-strong"><div style="display:flex;align-items:center;gap:8px">${legionEmblem(name,44)}${escHtml(name)}</div></td><td>${d.played}</td><td class="td-victory">${d.won}</td><td style="color:${pct>=50?"#7dc64a":"var(--blood-light)"}">${pct}%</td><td>${status}</td></tr>`;
-  }).join("");
-
   const warlordRows = Object.entries(warlordMap).sort((a,b)=>b[1].games-a[1].games).map(([name,d]) => {
     const pct = Math.round((d.survived/d.games)*100);
     return `<tr><td class="td-strong">${escHtml(name)}</td><td>${d.games}</td><td class="td-blood">${d.games-d.survived}</td><td style="color:${pct>=60?"#7dc64a":"var(--blood-light)"}">${pct}%</td></tr>`;
   }).join("");
 
+  const totalLegions = LEGIONS.length;
+  const facedCount = Object.keys(opponentMap).length;
+  const defeatedCount = Object.values(opponentMap).filter(d => d.won > 0).length;
+  const facedPct = Math.round((facedCount / totalLegions) * 100);
+  const defeatedPct = Math.round((defeatedCount / totalLegions) * 100);
+
+  const opRows = LEGIONS.slice().sort((a, b) => {
+    const da = opponentMap[a] || null;
+    const db = opponentMap[b] || null;
+    if (!da && !db) return 0;
+    if (!da) return 1;
+    if (!db) return -1;
+    if (db.played !== da.played) return db.played - da.played;
+    return db.won - da.won;
+  }).map(name => {
+    const d = opponentMap[name];
+    if (!d) {
+      return `<tr><td class="td-strong"><div style="display:flex;align-items:center;gap:8px">${legionEmblem(name,44)}${escHtml(name)}</div></td><td style="color:var(--text-dim)">—</td><td style="color:var(--text-dim)">—</td><td style="color:var(--text-dim)">—</td><td><span class="tag" style="background:rgba(80,70,50,0.15);border:1px solid var(--border);color:var(--text-dim)">Awaiting</span></td></tr>`;
+    }
+    const pct = Math.round((d.won / d.played) * 100);
+    const status = d.won > d.played - d.won ? `<span class="tag tag-victory">Dominant</span>` : d.won === d.played - d.won ? `<span class="tag tag-draw">Even</span>` : `<span class="tag tag-defeat">Struggling</span>`;
+    return `<tr><td class="td-strong"><div style="display:flex;align-items:center;gap:8px">${legionEmblem(name,44)}${escHtml(name)}</div></td><td>${d.played}</td><td class="td-victory">${d.won}</td><td style="color:${pct>=50?"#7dc64a":"var(--blood-light)"}">${pct}%</td><td>${status}</td></tr>`;
+  }).join("");
+
   el.innerHTML = `
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Battles Fought</div></div>
-      <div class="stat-card"><div class="stat-value" style="color:${winColor}">${winPct}%</div><div class="stat-label">Victory Rate</div><div class="stat-sub">${wins}W · ${draws}D · ${losses}L</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:${winColor}">${winPct}%</div><div class="stat-label">Victory Rate <span style="font-size:16px;vertical-align:middle">*</span></div><div class="stat-sub">${wins}W · ${draws}D · ${losses}L</div></div>
       <div class="stat-card"><div class="stat-value" style="color:${survColor}">${survivalPct}%</div><div class="stat-label">Warlord Survival</div><div class="stat-sub">${warlordDeaths} slain in battle</div></div>
       ${bestWarlordCard}
     </div>
     <div class="charts-row">
       <div class="chart-panel"><div class="chart-title">Legions Deployed</div><div id="pie-armies"></div></div>
-      <div class="chart-panel"><div class="chart-title">Battle Outcomes</div><div id="pie-outcomes"></div></div>
+      <div class="chart-panel"><div class="chart-title">Battle Outcomes <span style="font-size:16px;vertical-align:middle">*</span></div><div id="pie-outcomes"></div></div>
     </div>
     <div class="divider">Enemies of the Imperium</div>
+    <div class="panel" style="margin-bottom:20px">
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+            <div style="font-family:var(--font-heading);font-size:9px;letter-spacing:0.25em;color:var(--text-dim);text-transform:uppercase">Enemies Faced <span style="font-size:16px;vertical-align:middle">*</span></div>
+            <div style="font-family:var(--font-display);font-size:20px;color:${gradientColour(facedPct)}">${facedPct}%</div>
+          </div>
+          <div style="height:8px;position:relative;background:linear-gradient(90deg,#8b1a1a 0%,#8a6a1e 50%,#3f6428 100%);">
+            <div style="position:absolute;right:0;top:0;bottom:0;width:${100-facedPct}%;background:rgba(0,0,0,0.75);"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+            <div style="font-family:var(--font-heading);font-size:9px;letter-spacing:0.25em;color:var(--text-dim);text-transform:uppercase">Enemies Felled at least once <span style="font-size:16px;vertical-align:middle">*</span></div>
+            <div style="font-family:var(--font-display);font-size:20px;color:${gradientColour(defeatedPct)}">${defeatedPct}%</div>
+          </div>
+          <div style="height:8px;position:relative;background:linear-gradient(90deg,#8b1a1a 0%,#8a6a1e 50%,#3f6428 100%);">
+            <div style="position:absolute;right:0;top:0;bottom:0;width:${100-defeatedPct}%;background:rgba(0,0,0,0.75);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="panel">
-      <div class="panel-title">Foes Faced &amp; Felled</div>
+      <div class="panel-title">Foes Faced &amp; Felled <span style="font-size:16px;vertical-align:middle">*</span></div>
       <table class="data-table"><thead><tr><th>Enemy Legion</th><th>Engagements</th><th>Victories</th><th>Win Rate</th><th>Status</th></tr></thead><tbody>${opRows}</tbody></table>
     </div>
     ${warlordRows ? `<div class="panel mt-20"><div class="panel-title">Warlord Dossier</div><table class="data-table"><thead><tr><th>Warlord</th><th>Battles</th><th>Times Slain</th><th>Survival Rate</th></tr></thead><tbody>${warlordRows}</tbody></table></div>` : ""}
+    <div style="margin-top:28px;padding-top:16px;border-top:1px solid var(--border);font-family:var(--font-heading);font-size:9px;letter-spacing:0.15em;color:var(--text-dim);line-height:1.8">
+      * These statistics exclude All vs All battles, as the format makes it difficult to accurately attribute victories, defeats, and enemy interactions.
+    </div>
   `;
 
   drawPie("pie-armies", armyData);
@@ -1169,6 +1244,23 @@ function legionEmblem(name, size = 32) {
     return `<img src="${url}" width="${size}" height="${size}" style="display:inline-block;vertical-align:middle;flex-shrink:0;object-fit:contain;" onerror="this.style.display='none'" alt="${name}"/>`;
   }
   return "";
+}
+
+function gradientColour(pct) {
+  const t = pct / 100;
+  let r, g, b;
+  if (t < 0.5) {
+    const s = t / 0.5;
+    r = Math.round(139 + (138 - 139) * s);
+    g = Math.round(26  + (106 - 26)  * s);
+    b = Math.round(26  + (30  - 26)  * s);
+  } else {
+    const s = (t - 0.5) / 0.5;
+    r = Math.round(138 + (63  - 138) * s);
+    g = Math.round(106 + (100 - 106) * s);
+    b = Math.round(30  + (40  - 30)  * s);
+  }
+  return `rgb(${r},${g},${b})`;
 }
 
 function drawPie(containerId, data) {
