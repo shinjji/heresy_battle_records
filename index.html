@@ -356,11 +356,19 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
         <div class="section-rule"></div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <label class="form-label" style="white-space:nowrap">Filter by My Legion</label>
-          <select class="form-select" id="filterArmy" onchange="renderRecords()" style="width:auto;min-width:180px">
-            <option value="">All Legions</option>
-          </select>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <label class="form-label" style="white-space:nowrap">My Legion</label>
+            <select class="form-select" id="filterArmy" onchange="renderRecords()" style="width:auto;min-width:180px">
+              <option value="">All Legions</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <label class="form-label" style="white-space:nowrap">Campaign</label>
+            <select class="form-select" id="filterCampaign" onchange="renderRecords()" style="width:auto;min-width:180px">
+              <option value="">All Campaigns</option>
+            </select>
+          </div>
         </div>
         <button class="btn btn-secondary btn-sm" onclick="fetchRecords()" id="refreshBtn" disabled>↻ Refresh</button>
       </div>
@@ -393,20 +401,32 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
         <div class="form-grid three">
           <div class="form-field">
             <label class="form-label" id="lbl-myArmy">My Legion *</label>
-            <select class="form-select" id="f-myArmy" onchange="clearError(this); updateEmblemPreview()"><option value="">Select legion…</option></select>
+            <select class="form-select" id="f-myArmy" onchange="onMyArmyChange(this)"><option value="">Select legion…</option></select>
+            <div id="my-allies"></div>
+            <button type="button" class="btn btn-secondary" id="addMyAllyBtn" style="font-size:9px;padding:6px 14px;margin-top:8px;width:100%" onclick="addAlly('my')">+ Add Ally</button>
           </div>
           <div class="form-field">
-            <label class="form-label" id="lbl-opponentArmy">Enemy Force *</label>
-            <select class="form-select" id="f-opponentArmy" onchange="clearError(this); updateEmblemPreview()"><option value="">Select force…</option></select>
+            <label class="form-label" id="lbl-opponentArmy">Enemy Legion *</label>
+            <select class="form-select" id="f-opponentArmy" onchange="onOpArmyChange(this)"><option value="">Select force…</option></select>
+            <div id="enemy-allies"></div>
+            <button type="button" class="btn btn-secondary" id="addEnemyAllyBtn" style="font-size:9px;padding:6px 14px;margin-top:8px;width:100%" onclick="addAlly('enemy')">+ Add Ally</button>
           </div>
           <div class="form-field">
             <label class="form-label">Points Limit *</label>
             <input class="form-input" type="number" placeholder="e.g. 3000" id="f-points" oninput="clearError(this)"/>
           </div>
+        </div>
+        <div class="form-grid" style="margin-top:16px">
           <div class="form-field">
             <label class="form-label">Mission *</label>
             <input class="form-input" id="f-mission" placeholder="e.g. Annihilation, Zone Mortalis…" oninput="clearError(this)"/>
           </div>
+          <div class="form-field">
+            <label class="form-label">Campaign</label>
+            <input class="form-input" id="f-campaign" placeholder="e.g. The Siege of Calth…"/>
+          </div>
+        </div>
+        <div class="form-grid" style="margin-top:16px">
           <div class="form-field form-col-full">
             <label class="form-label">Mission Details *</label>
             <textarea class="form-textarea" id="f-missionDetails" style="min-height:70px" placeholder="Describe the mission parameters, deployment, special rules…" oninput="clearError(this)"></textarea>
@@ -415,19 +435,20 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
       </div>
 
       <div class="panel">
+        <div class="panel-title">Player Details</div>
+        <div id="player-details-list" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+
+      <div class="panel">
         <div class="panel-title">Outcome</div>
         <div class="form-grid">
-          <div class="form-field">
+          <div class="form-field form-col-full">
             <label class="form-label">Result *</label>
             <div class="radio-group">
               <div class="radio-option victory"><input type="radio" id="r-Victory" name="myResult" value="Victory" onchange="clearRadioError(this)"/><label for="r-Victory" class="radio-label">Victory</label></div>
               <div class="radio-option"><input type="radio" id="r-Draw" name="myResult" value="Draw" onchange="clearRadioError(this)"/><label for="r-Draw" class="radio-label">Draw</label></div>
               <div class="radio-option"><input type="radio" id="r-Defeat" name="myResult" value="Defeat" onchange="clearRadioError(this)"/><label for="r-Defeat" class="radio-label">Defeat</label></div>
             </div>
-          </div>
-          <div class="form-field">
-            <label class="form-label">Victor (player name / legion) *</label>
-            <input class="form-input" id="f-winner" placeholder="Who claimed victory?" oninput="clearError(this)"/>
           </div>
           <div class="form-field form-col-full">
             <label class="form-label">Battle Highlights *</label>
@@ -502,7 +523,7 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
       </div>
       <div class="note-box">
         Sheet tab must be named <strong style="color:var(--gold-dark)">Heresy_Battle_Record</strong> with columns:<br/>
-        <span style="color:var(--parchment-dark);font-size:11px">Timestamp, MyArmy, OpponentArmy, Points, Mission, MissionDetails, Winner, MyResult, Highlights, WarlordDied, WarlordHow, WarlordName, Images</span>
+        <span style="color:var(--parchment-dark);font-size:11px">Timestamp, MyArmy, OpponentArmy, Points, Mission, MissionDetails, MyResult, Highlights, WarlordDied, WarlordHow, WarlordName, Images, Campaign, MyPlayers, OpponentPlayers, All_Vs_All</span>
       </div>
       <div style="display:flex;gap:12px;justify-content:flex-end">
         <button class="btn btn-secondary btn-sm" id="cancelCfgBtn" onclick="closeConfig()" style="display:none">Cancel</button>
@@ -532,7 +553,7 @@ const LEGIONS = [
   "Thousand Sons","Sons of Horus","Word Bearers","Salamanders",
   "Raven Guard","Alpha Legion","Solar Auxilia","Mechanicum",
   "Imperial Army","Legio Custodes","Blackshields","Shattered Legions",
-  "Daemons of the Ruinstorm"
+  "Daemons of the Ruinstorm","Titan Legions"
 ];
 
 const MISSIONS = [
@@ -543,7 +564,7 @@ const MISSIONS = [
 ];
 
 const PIE_COLORS = ["#c9a84c","#8b1a1a","#4a7a8a","#6b8a4a","#7a4a8a","#8a6a2a","#4a4a8a","#8a4a4a","#4a8a6a","#8a7a4a","#5a4a7a","#7a5a4a"];
-const COLS = ["Timestamp","MyArmy","OpponentArmy","Points","Mission","MissionDetails","Winner","MyResult","Highlights","WarlordDied","WarlordHow","WarlordName","Images"];
+const COLS = ["Timestamp","MyArmy","OpponentArmy","Points","Mission","MissionDetails","MyResult","Highlights","WarlordDied","WarlordHow","WarlordName","Images","Campaign","MyPlayers","OpponentPlayers","All_Vs_All"];
 
 let cfg = { apiKey: "", sheetId: "", serviceJson: "" };
 let allRecords = [];
@@ -592,34 +613,89 @@ function showToast(msg, type = "success") {
 
 function isConfigured() { return cfg.apiKey && cfg.sheetId && cfg.serviceJson; }
 
-function updateEmblemPreview() {
-  const myArmy = $("f-myArmy").value;
-  const opArmy = $("f-opponentArmy").value;
-  const preview = $("emblemPreview");
-  const myUrl = LEGION_EMBLEMS[myArmy];
-  const opUrl = LEGION_EMBLEMS[opArmy];
-  if (!myUrl && !opUrl) { preview.style.display = "none"; return; }
-  preview.style.display = "flex";
-  $("prev-myArmy").innerHTML = myUrl ? `<img src="${myUrl}" width="80" height="80" style="border-radius:50%;object-fit:cover;" alt="${myArmy}"/>` : "";
-  $("prev-myArmy-name").textContent = myArmy || "";
-  $("prev-opponentArmy").innerHTML = opUrl ? `<img src="${opUrl}" width="80" height="80" style="border-radius:50%;object-fit:cover;" alt="${opArmy}"/>` : "";
-  $("prev-opponentArmy-name").textContent = opArmy || "";
+function addAlly(side) {
+  const containerId = side === "my" ? "my-allies" : "enemy-allies";
+  const container = $(containerId);
+  const idx = container.children.length;
+  const wrapper = document.createElement("div");
+  wrapper.style.cssText = "display:flex;gap:6px;align-items:center;margin-top:8px";
+  const sel = document.createElement("select");
+  sel.className = "form-select";
+  sel.style.flex = "1";
+  sel.innerHTML = `<option value="">Select ally…</option>` + LEGIONS.map(l => `<option value="${l}">${l}</option>`).join("");
+  sel.onchange = () => { updateEmblemPreview(); buildPlayerDetails(); };
+  const removeBtn = document.createElement("button");
+  removeBtn.type = "button";
+  removeBtn.textContent = "✕";
+  removeBtn.style.cssText = "background:none;border:1px solid var(--border);color:var(--text-dim);padding:0 10px;cursor:pointer;height:43px;flex-shrink:0;font-size:14px";
+  removeBtn.onclick = () => { wrapper.remove(); updateEmblemPreview(); buildPlayerDetails(); };
+  wrapper.appendChild(sel);
+  wrapper.appendChild(removeBtn);
+  container.appendChild(wrapper);
 }
 
-function clearError(el) { el.previousElementSibling.classList.remove("error"); }
+function getSideArmies(primary, containerId) {
+  const allies = [...$(containerId).querySelectorAll("select")].map(s => s.value).filter(Boolean);
+  return [primary, ...allies].filter(Boolean).join(", ");
+}
+
+function getPlayerNames(side) {
+  return [...$(`${side === "my" ? "player-my" : "player-enemy"}-list`).querySelectorAll("input")]
+    .map(i => i.value.trim()).join(", ");
+}
+
+function buildPlayerDetails() {
+  const myArmy = $("f-myArmy").value;
+  const opArmy = $("f-opponentArmy").value;
+  const myAllies = [...$("my-allies").querySelectorAll("select")].map(s => s.value).filter(Boolean);
+  const enemyAllies = [...$("enemy-allies").querySelectorAll("select")].map(s => s.value).filter(Boolean);
+  const myAll = [myArmy, ...myAllies].filter(Boolean);
+  const opAll = [opArmy, ...enemyAllies].filter(Boolean);
+  const container = $("player-details-list");
+  container.innerHTML = "";
+  if (myAll.length === 0 && opAll.length === 0) {
+    container.innerHTML = `<div style="font-family:var(--font-heading);font-size:10px;letter-spacing:0.2em;color:var(--text-dim)">Select legions above to enter player names.</div>`;
+    return;
+  }
+  const makeRow = (legion, id) => `
+    <div style="display:flex;align-items:center;gap:12px">
+      ${legionEmblem(legion, 32)}
+      <div style="font-family:var(--font-heading);font-size:10px;letter-spacing:0.15em;color:var(--parchment);min-width:160px;text-transform:uppercase">${escHtml(legion)}</div>
+      <input class="form-input" id="${id}" placeholder="Player name…" style="flex:1"/>
+    </div>`;
+  if (myAll.length > 0) {
+    const section = document.createElement("div");
+    section.innerHTML = `<div style="font-family:var(--font-heading);font-size:8px;letter-spacing:0.3em;color:var(--gold-dark);text-transform:uppercase;margin-bottom:8px">My Side</div><div id="player-my-list" style="display:flex;flex-direction:column;gap:8px">${myAll.map((l,i) => makeRow(l, `player-my-${i}`)).join("")}</div>`;
+    container.appendChild(section);
+  }
+  if (opAll.length > 0) {
+    const section = document.createElement("div");
+    section.style.marginTop = myAll.length > 0 ? "16px" : "0";
+    section.innerHTML = `<div style="font-family:var(--font-heading);font-size:8px;letter-spacing:0.3em;color:var(--gold-dark);text-transform:uppercase;margin-bottom:8px">Enemy Side</div><div id="player-enemy-list" style="display:flex;flex-direction:column;gap:8px">${opAll.map((l,i) => makeRow(l, `player-enemy-${i}`)).join("")}</div>`;
+    container.appendChild(section);
+  }
+}
+
+function onMyArmyChange(el) { try { clearError(el); } catch(e) {} updateEmblemPreview(); buildPlayerDetails(); }
+function onOpArmyChange(el) { try { clearError(el); } catch(e) {} updateEmblemPreview(); buildPlayerDetails(); }
+function clearError(el) { const p = el.previousElementSibling; if (p) p.classList.remove("error"); }
 
 function updateEmblemPreview() {
   const myArmy = $("f-myArmy").value;
   const opArmy = $("f-opponentArmy").value;
+  const myAllies = [...$("my-allies").querySelectorAll("select")].map(s => s.value).filter(Boolean);
+  const enemyAllies = [...$("enemy-allies").querySelectorAll("select")].map(s => s.value).filter(Boolean);
+  const myAll = [myArmy, ...myAllies].filter(Boolean);
+  const opAll = [opArmy, ...enemyAllies].filter(Boolean);
   const preview = $("emblemPreview");
-  const myHasEmblem = myArmy && LEGION_EMBLEMS[myArmy];
-  const opHasEmblem = opArmy && LEGION_EMBLEMS[opArmy];
-  if (!myHasEmblem && !opHasEmblem) { preview.style.display = "none"; return; }
+  const anySelected = myAll.length > 0 || opAll.length > 0;
+  const anyEmblem = [...myAll, ...opAll].some(a => LEGION_EMBLEMS[a]);
+  if (!anySelected || !anyEmblem) { preview.style.display = "none"; return; }
   preview.style.display = "flex";
-  $("prev-myArmy").innerHTML = myArmy ? legionEmblem(myArmy, 90) : "";
-  $("prev-myArmy-name").textContent = myArmy || "";
-  $("prev-opponentArmy").innerHTML = opArmy ? legionEmblem(opArmy, 90) : "";
-  $("prev-opponentArmy-name").textContent = opArmy || "";
+  $("prev-myArmy").innerHTML = myAll.length ? myAll.map(a => legionEmblem(a, 90)).join("") : "";
+  $("prev-myArmy-name").textContent = myAll.join(" & ");
+  $("prev-opponentArmy").innerHTML = opAll.length ? opAll.map(a => legionEmblem(a, 90)).join("") : "";
+  $("prev-opponentArmy-name").textContent = opAll.join(" & ");
 }
 function clearRadioError(el) {
   const group = el.closest(".radio-group");
@@ -697,7 +773,7 @@ async function fetchRecords(forStats = false) {
   if (!forStats) $("recordsList").innerHTML = "";
   try {
     const token = await getAccessToken();
-    const range = encodeURIComponent("Heresy_Battle_Record!A2:M");
+    const range = encodeURIComponent("Heresy_Battle_Record!A2:P");
     const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${range}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -723,7 +799,7 @@ async function saveRecord() {
   const mission = $("f-mission").value.trim();
   const missionDetails = $("f-missionDetails").value.trim();
   const myResult = document.querySelector('input[name="myResult"]:checked')?.value || "";
-  const winner = $("f-winner").value.trim();
+  const winner = "";
   const highlights = $("f-highlights").value.trim();
   const warlordName = $("f-warlordName").value.trim();
   const warlordDied = document.querySelector('input[name="warlordDied"]:checked')?.value || "";
@@ -748,7 +824,7 @@ async function saveRecord() {
   if (!mission) err($("f-mission"));
   if (!missionDetails) err($("f-missionDetails"));
   if (!myResult) errRadio("myResult");
-  if (!winner) err($("f-winner"));
+
   if (!highlights) err($("f-highlights"));
   if (!warlordName) err($("f-warlordName"));
   if (!warlordDied) errRadio("warlordDied");
@@ -759,13 +835,18 @@ async function saveRecord() {
   try {
     const token = await getAccessToken();
     const warlordDied = document.querySelector('input[name="warlordDied"]:checked')?.value || "No";
+    const myArmyFull = getSideArmies(myArmy, "my-allies");
+    const opponentArmyFull = getSideArmies(opponentArmy, "enemy-allies");
+    const myPlayers = getPlayerNames("my");
+    const opponentPlayers = getPlayerNames("enemy");
     const row = [
-      new Date().toISOString(), myArmy, opponentArmy,
+      new Date().toISOString(), myArmyFull, opponentArmyFull,
       $("f-points").value, mission, $("f-missionDetails").value,
-      $("f-winner").value, myResult, $("f-highlights").value,
-      warlordDied, $("f-warlordHow").value, $("f-warlordName").value, $("f-images").value
+      myResult, $("f-highlights").value,
+      warlordDied, $("f-warlordHow").value, $("f-warlordName").value, $("f-images").value,
+      $("f-campaign").value.trim(), myPlayers, opponentPlayers, ""
     ];
-    const range = encodeURIComponent("Heresy_Battle_Record!A:M");
+    const range = encodeURIComponent("Heresy_Battle_Record!A:P");
     const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${range}:append?valueInputOption=USER_ENTERED`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -775,10 +856,14 @@ async function saveRecord() {
     showToast("Battle record etched into the annals of war");
     // Reset form
     ["f-myArmy","f-opponentArmy","f-mission"].forEach(id => $(id).value = "");
-    ["f-points","f-missionDetails","f-winner","f-highlights","f-warlordHow","f-warlordName","f-images"].forEach(id => $(id).value = "");
+    ["f-points","f-missionDetails","f-highlights","f-warlordHow","f-warlordName","f-images","f-campaign"].forEach(id => $(id).value = "");
     document.querySelectorAll('input[name="myResult"]').forEach(r => r.checked = false);
     $("wd-No").checked = true;
     $("warlordHowField").classList.add("hidden");
+    $("my-allies").innerHTML = "";
+    $("enemy-allies").innerHTML = "";
+    $("player-details-list").innerHTML = "";
+    updateEmblemPreview();
     allRecords = [];
   } catch(e) {
     showToast("Failed to save: " + e.message, "error");
@@ -801,15 +886,29 @@ function renderRecords() {
   const el = $("recordsList");
   const filterSel = $("filterArmy");
 
-  // Populate filter options from unique MyArmy values
+  // Populate filter with individual unique legions extracted from all MyArmy values
   const currentFilter = filterSel ? filterSel.value : "";
   if (filterSel) {
-    const armies = [...new Set(allRecords.map(r => r.MyArmy).filter(Boolean))].sort();
+    const legionSet = new Set();
+    allRecords.forEach(r => {
+      if (r.MyArmy) r.MyArmy.split(",").forEach(a => { const t = a.trim(); if (t) legionSet.add(t); });
+    });
+    const armies = [...legionSet].sort();
     filterSel.innerHTML = `<option value="">All Legions</option>` + armies.map(a => `<option value="${a}" ${a === currentFilter ? "selected" : ""}>${a}</option>`).join("");
   }
 
-  // Apply filter
-  const filtered = currentFilter ? allRecords.filter(r => r.MyArmy === currentFilter) : allRecords;
+  // Populate campaign filter
+  const campaignSel = $("filterCampaign");
+  const currentCampaign = campaignSel ? campaignSel.value : "";
+  if (campaignSel) {
+    const campaigns = [...new Set(allRecords.map(r => r.Campaign).filter(Boolean))].sort();
+    campaignSel.innerHTML = `<option value="">All Campaigns</option>` + campaigns.map(c => `<option value="${c}" ${c === currentCampaign ? "selected" : ""}>${c}</option>`).join("");
+  }
+
+  // Match any record where the selected legion appears anywhere in MyArmy
+  const filtered = allRecords
+    .filter(r => !currentFilter || (r.MyArmy && r.MyArmy.split(",").map(s => s.trim()).includes(currentFilter)))
+    .filter(r => !currentCampaign || r.Campaign === currentCampaign);
 
   if (filtered.length === 0) {
     el.innerHTML = allRecords.length === 0
@@ -838,33 +937,51 @@ function renderRecords() {
     const missionDetail = rec.MissionDetails
       ? `<div><div class="record-field-label">Mission Details</div><div class="record-field-value" style="font-size:14px;color:var(--text-secondary)">${escHtml(rec.MissionDetails)}</div></div>`
       : "";
-    const winnerHtml = rec.Winner
-      ? `<div><div class="record-field-label">Victor</div><div class="record-field-value">${escHtml(rec.Winner)}</div></div>`
-      : "";
+    const missionDisplay = rec.Campaign ? `${escHtml(rec.Campaign)} — ${escHtml(rec.Mission || "Unknown Mission")}` : escHtml(rec.Mission || "Unknown Mission");
+    const myArmies = rec.MyArmy ? rec.MyArmy.split(",").map(s => s.trim()).filter(Boolean) : [];
+    const isAllVsAll = rec.All_Vs_All === "TRUE" || rec.All_Vs_All === "true" || rec.All_Vs_All === "1";
+    const opArmies = rec.OpponentArmy ? rec.OpponentArmy.split(",").map(s => s.trim()).filter(Boolean) : [];
+    const myEmblems = myArmies.map(a => legionEmblem(a, 60)).join("");
+    // All_Vs_All header: each enemy emblem separated by 'vs'
+    const opEmblems = isAllVsAll
+      ? opArmies.map((a, i) => `${i > 0 ? `<span style="font-family:var(--font-display);font-size:11px;color:var(--gold-dark)">vs</span>` : ""}${legionEmblem(a, 60)}`).join("")
+      : opArmies.map(a => legionEmblem(a, 60)).join("");
+    const myEmblemsLg = myArmies.map(a => legionEmblem(a, 104)).join("");
+    const hasOpEmblem = opArmies.some(a => LEGION_EMBLEMS[a]);
+    const myPlayers = rec.MyPlayers ? rec.MyPlayers.split(",").map(s => s.trim()) : [];
+    const opPlayers = rec.OpponentPlayers ? rec.OpponentPlayers.split(",").map(s => s.trim()) : [];
+    const myLegionLines = myArmies.map((a, i) => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:${i < myArmies.length-1 ? '8px' : '0'}">${legionEmblem(a, 104)}<div><div style="font-size:15px;color:var(--parchment)">${escHtml(a)}</div>${myPlayers[i] ? `<div style="font-size:12px;color:var(--text-dim);font-family:var(--font-heading);letter-spacing:0.1em">${escHtml(myPlayers[i])}</div>` : ""}</div></div>`).join("");
+    const victorTag = "";
+    const opLegionLines = opArmies.map((a, i) => {
+      const isVictor = isAllVsAll && rec.MyResult === "Defeat" && i === 0;
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:${i < opArmies.length-1 ? '8px' : '0'}">${legionEmblem(a, 104)}<div><div style="font-size:15px;color:var(--parchment)">${escHtml(a)}${isVictor ? ` <span style="font-family:var(--font-heading);font-size:9px;letter-spacing:0.15em;color:#f0c020;margin-left:6px">⚔ VICTOR</span>` : ""}</div>${opPlayers[i] ? `<div style="font-size:12px;color:var(--text-dim);font-family:var(--font-heading);letter-spacing:0.1em">${escHtml(opPlayers[i])}</div>` : ""}</div></div>`;
+    }).join("");
+    const enemyLegionLabel = isAllVsAll ? "Enemy Legions" : "Enemy Legion";
     return `
       <div class="record-card">
         <div class="record-header" onclick="toggleRecord(${allRecords.indexOf(rec)})">
           <div class="record-header-left">
             <div class="record-number">#${num}</div>
             <div style="display:flex;align-items:center;gap:10px">
-              ${legionEmblem(rec.MyArmy, 60)}
+              ${myEmblems}
+              ${hasOpEmblem || opArmies.length ? `<span style="font-family:var(--font-display);font-size:11px;color:var(--gold-dark)">vs</span>${opEmblems}` : ""}
               <div>
-                <div class="record-mission">${escHtml(rec.Mission || "Unknown Mission")}</div>
+                <div class="record-mission">${missionDisplay}</div>
                 <div class="record-meta">${escHtml(rec.MyArmy)} vs ${escHtml(rec.OpponentArmy)}${pts}${date ? ` · ${date}` : ""}</div>
               </div>
             </div>
           </div>
           <div class="record-tags">
             <span class="tag ${resultClass}">${rec.MyResult || "?"}</span>
-            ${warlordTag}
+            ${warlordTag}${victorTag}
             <span class="record-chevron" id="chev-${allRecords.indexOf(rec)}">▶</span>
           </div>
         </div>
         <div class="record-body" id="body-${allRecords.indexOf(rec)}">
           <div class="record-body-grid">
-            <div><div class="record-field-label">My Legion</div><div class="record-field-value" style="display:flex;align-items:center;gap:8px">${legionEmblem(rec.MyArmy, 104)}${escHtml(rec.MyArmy)}</div></div>
-            <div><div class="record-field-label">Enemy Force</div><div class="record-field-value" style="display:flex;align-items:center;gap:8px">${legionEmblem(rec.OpponentArmy, 104)}${escHtml(rec.OpponentArmy)}</div></div>
-            ${winnerHtml}${missionDetail}${warlordInfo}
+            <div><div class="record-field-label">My Legion</div><div class="record-field-value">${myLegionLines}</div></div>
+            <div><div class="record-field-label">${enemyLegionLabel}</div><div class="record-field-value">${opLegionLines}</div></div>
+            ${missionDetail}${warlordInfo}
           </div>
           ${highlightHtml}${imgHtml}
         </div>
@@ -936,28 +1053,32 @@ function renderStats() {
     el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📜</div><div class="empty-state-text">No data to calculate. Log your first battle.</div></div>`;
     return;
   }
-  const total = allRecords.length;
-  const wins = allRecords.filter(r => r.MyResult === "Victory").length;
-  const losses = allRecords.filter(r => r.MyResult === "Defeat").length;
-  const draws = allRecords.filter(r => r.MyResult === "Draw").length;
-  const warlordDeaths = allRecords.filter(r => r.WarlordDied === "Yes").length;
+  const statsRecords = allRecords.filter(r => r.All_Vs_All !== "TRUE" && r.All_Vs_All !== "true" && r.All_Vs_All !== "1");
+  const total = statsRecords.length;
+  const wins = statsRecords.filter(r => r.MyResult === "Victory").length;
+  const losses = statsRecords.filter(r => r.MyResult === "Defeat").length;
+  const draws = statsRecords.filter(r => r.MyResult === "Draw").length;
+  const warlordDeaths = statsRecords.filter(r => r.WarlordDied === "Yes").length;
   const winPct = Math.round((wins / total) * 100);
   const survivalPct = Math.round(((total - warlordDeaths) / total) * 100);
 
   const armyCount = {};
-  allRecords.forEach(r => { if (r.MyArmy) armyCount[r.MyArmy] = (armyCount[r.MyArmy] || 0) + 1; });
+  statsRecords.forEach(r => { if (r.MyArmy) armyCount[r.MyArmy] = (armyCount[r.MyArmy] || 0) + 1; });
   const armyData = Object.entries(armyCount).map(([name, value]) => ({ name, value })).sort((a,b)=>b.value-a.value);
 
   const opponentMap = {};
-  allRecords.forEach(r => {
+  statsRecords.forEach(r => {
     if (!r.OpponentArmy) return;
-    if (!opponentMap[r.OpponentArmy]) opponentMap[r.OpponentArmy] = { played: 0, won: 0 };
-    opponentMap[r.OpponentArmy].played++;
-    if (r.MyResult === "Victory") opponentMap[r.OpponentArmy].won++;
+    const armies = r.OpponentArmy.split(",").map(s => s.trim()).filter(Boolean);
+    armies.forEach(army => {
+      if (!opponentMap[army]) opponentMap[army] = { played: 0, won: 0 };
+      opponentMap[army].played++;
+      if (r.MyResult === "Victory") opponentMap[army].won++;
+    });
   });
 
   const warlordMap = {};
-  allRecords.forEach(r => {
+  statsRecords.forEach(r => {
     if (!r.WarlordName) return;
     if (!warlordMap[r.WarlordName]) warlordMap[r.WarlordName] = { games: 0, survived: 0 };
     warlordMap[r.WarlordName].games++;
@@ -1000,7 +1121,7 @@ function renderStats() {
     <div class="divider">Enemies of the Imperium</div>
     <div class="panel">
       <div class="panel-title">Foes Faced &amp; Felled</div>
-      <table class="data-table"><thead><tr><th>Enemy Force</th><th>Engagements</th><th>Victories</th><th>Win Rate</th><th>Status</th></tr></thead><tbody>${opRows}</tbody></table>
+      <table class="data-table"><thead><tr><th>Enemy Legion</th><th>Engagements</th><th>Victories</th><th>Win Rate</th><th>Status</th></tr></thead><tbody>${opRows}</tbody></table>
     </div>
     ${warlordRows ? `<div class="panel mt-20"><div class="panel-title">Warlord Dossier</div><table class="data-table"><thead><tr><th>Warlord</th><th>Battles</th><th>Times Slain</th><th>Survival Rate</th></tr></thead><tbody>${warlordRows}</tbody></table></div>` : ""}
   `;
@@ -1039,6 +1160,7 @@ const LEGION_EMBLEMS = {
   "Ultramarines":              "https://wsrv.nl/?url=https://drive.google.com/uc?id=1dJkIuN8cces0pokyWRnHv6LtHkRA_QM8",
   "White Scars":               "https://wsrv.nl/?url=https://drive.google.com/uc?id=1peN6yOtAEYZmggltgrtLG6puzxauTOC1",
   "Word Bearers":              "https://wsrv.nl/?url=https://drive.google.com/uc?id=1DYkzlg561ZasNd-kSY_jwbQ2Cql_dfvu",
+  "Titan Legions":             "https://wsrv.nl/?url=https://drive.google.com/uc?id=1rvkr3n7AXW_k71g8rWJEix7P3G2Cry0m",
 };
 
 function legionEmblem(name, size = 32) {
