@@ -232,11 +232,11 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
 
 /* TABLE */
 .data-table { width: 100%; border-collapse: collapse; }
-.data-table th { font-family: var(--font-heading); font-size: 8px; letter-spacing: 0.25em; color: var(--gold-dark); text-transform: uppercase; text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-.data-table td { padding: 10px 14px; border-bottom: 1px solid rgba(201,168,76,0.08); font-size: 14px; color: var(--text-secondary); }
+.data-table th { font-family: var(--font-heading); font-size: 8px; letter-spacing: 0.15em; color: var(--gold-dark); text-transform: uppercase; text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.data-table td { padding: 6px 8px; border-bottom: 1px solid rgba(201,168,76,0.08); font-size: 13px; color: var(--text-secondary); }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tr:hover td { background: rgba(201,168,76,0.03); color: var(--parchment); }
-.td-strong { color: var(--parchment); font-family: var(--font-heading); font-size: 12px; letter-spacing: 0.05em; }
+.td-strong { color: var(--parchment); font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.05em; }
 .td-victory { color: #7dc64a; }
 .td-blood { color: var(--blood-light); }
 
@@ -310,6 +310,14 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
   .charts-row { grid-template-columns: 1fr; }
   .record-body-grid { grid-column: 1fr; }
   .nav-btn { padding: 10px 12px; font-size: 9px; letter-spacing: 0.1em; }
+  .data-table .col-status { display: none; }
+  .data-table th:last-child, .data-table td:last-child { display: none; }
+  .records-filter-label { display: none; }
+  .record-header { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
+  .record-header-left { width: 100%; }
+  .record-header-left > div:last-child { flex-wrap: wrap; gap: 6px; }
+  .record-tags { width: 100%; justify-content: center; gap: 6px; }
+  .record-number { width: auto; margin-right: 4px; }
 }
 </style>
 </head>
@@ -351,26 +359,24 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
     <!-- RECORDS TAB -->
     <div id="tab-records">
       <div class="section-header">
-        <div class="section-eyebrow">Liber Bellum</div>
-        <div class="section-title">Battle Records</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div>
+            <div class="section-eyebrow">Liber Bellum</div>
+            <div class="section-title">Battle Records</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="fetchRecords()" id="refreshBtn" disabled style="flex-shrink:0;margin-top:4px">↻ Refresh</button>
+        </div>
         <div class="section-rule"></div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <label class="form-label" style="white-space:nowrap">My Legion</label>
-            <select class="form-select" id="filterArmy" onchange="renderRecords()" style="width:auto;min-width:180px">
-              <option value="">All Legions</option>
-            </select>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <label class="form-label" style="white-space:nowrap">Campaign</label>
-            <select class="form-select" id="filterCampaign" onchange="renderRecords()" style="width:auto;min-width:180px">
-              <option value="">All Campaigns</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn btn-secondary btn-sm" onclick="fetchRecords()" id="refreshBtn" disabled>↻ Refresh</button>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:nowrap;">
+        <label class="form-label records-filter-label" style="white-space:nowrap">My Legion</label>
+        <select class="form-select" id="filterArmy" onchange="renderRecords()" style="flex:1;min-width:0">
+          <option value="">All Legions</option>
+        </select>
+        <label class="form-label records-filter-label" style="white-space:nowrap">Campaign</label>
+        <select class="form-select" id="filterCampaign" onchange="renderRecords()" style="flex:1;min-width:0">
+          <option value="">All Campaigns</option>
+        </select>
       </div>
       <div id="recordsLoading" class="loading hidden"><div class="loading-spinner"></div><span>Consulting the war-scrolls…</span></div>
       <div id="recordsList"></div>
@@ -429,7 +435,7 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
         <div class="form-grid" style="margin-top:16px">
           <div class="form-field form-col-full">
             <label class="form-label">Mission Details *</label>
-            <textarea class="form-textarea" id="f-missionDetails" style="min-height:70px" placeholder="Describe the mission parameters, deployment, special rules…" oninput="clearError(this)"></textarea>
+            <textarea class="form-textarea" id="f-missionDetails" style="min-height:140px" placeholder="Describe the mission parameters, deployment, special rules…" oninput="clearError(this)"></textarea>
           </div>
         </div>
       </div>
@@ -452,7 +458,7 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
           </div>
           <div class="form-field form-col-full">
             <label class="form-label">Battle Highlights *</label>
-            <textarea class="form-textarea" id="f-highlights" placeholder="Glorious moments, decisive manoeuvres, treacherous betrayals…" oninput="clearError(this)"></textarea>
+            <textarea class="form-textarea" id="f-highlights" style="min-height:140px" placeholder="Glorious moments, decisive manoeuvres, treacherous betrayals…" oninput="clearError(this)"></textarea>
           </div>
         </div>
       </div>
