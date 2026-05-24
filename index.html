@@ -139,6 +139,19 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
 }
 .form-select option { background: #1a1612; color: #e8dcc8; }
 .form-textarea { resize: vertical; min-height: 90px; }
+.autocomplete-wrap { position: relative; }
+.autocomplete-list {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
+  background: #1a1612; border: 1px solid var(--border-strong); border-top: none;
+  max-height: 180px; overflow-y: auto; display: none;
+}
+.autocomplete-list.show { display: block; }
+.autocomplete-item {
+  padding: 8px 14px; cursor: pointer; font-family: var(--font-body); font-size: 16px;
+  color: var(--text-primary); border-bottom: 1px solid var(--border);
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover, .autocomplete-item.active { background: rgba(201,168,76,0.15); color: var(--gold-light); }
 
 .form-label.error { color: var(--blood-light); }
 .radio-group.error .radio-label { border-color: var(--blood); }
@@ -481,7 +494,10 @@ body { background: var(--ash); color: var(--text-primary); font-family: var(--fo
         <div class="form-grid">
           <div class="form-field">
             <label class="form-label">Warlord Name *</label>
-            <input class="form-input" id="f-warlordName" placeholder="Name or title" oninput="clearError(this)"/>
+            <div class="autocomplete-wrap">
+              <input class="form-input" id="f-warlordName" placeholder="Name or title" oninput="clearError(this); showWarlordSuggestions()" autocomplete="off"/>
+              <div class="autocomplete-list" id="warlordSuggestions"></div>
+            </div>
           </div>
           <div class="form-field">
             <label class="form-label">Warlord Slain? *</label>
@@ -637,6 +653,66 @@ function showToast(msg, type = "success") {
 }
 
 function isConfigured() { return cfg.apiKey && cfg.sheetId && cfg.serviceJson; }
+
+// ── WARLORD AUTOCOMPLETE ──
+function getKnownWarlords() {
+  const names = new Set();
+  allRecords.forEach(r => { if (r.WarlordName) names.add(r.WarlordName); });
+  return [...names].sort((a, b) => a.localeCompare(b));
+}
+
+let warlordActiveIdx = -1;
+
+function showWarlordSuggestions() {
+  const input = $("f-warlordName");
+  const list = $("warlordSuggestions");
+  const query = input.value.trim().toLowerCase();
+  warlordActiveIdx = -1;
+  if (!query) { list.classList.remove("show"); list.innerHTML = ""; return; }
+  const matches = getKnownWarlords().filter(n => n.toLowerCase().includes(query));
+  if (!matches.length) { list.classList.remove("show"); list.innerHTML = ""; return; }
+  list.innerHTML = matches.map((n, i) => `<div class="autocomplete-item" data-idx="${i}" onmousedown="pickWarlord('${n.replace(/'/g, "\\'")}')">${escHtml(n)}</div>`).join("");
+  list.classList.add("show");
+}
+
+function pickWarlord(name) {
+  const input = $("f-warlordName");
+  input.value = name;
+  $("warlordSuggestions").classList.remove("show");
+  $("warlordSuggestions").innerHTML = "";
+  clearError(input);
+}
+
+(function initWarlordAutocomplete() {
+  document.addEventListener("click", e => {
+    const wrap = document.querySelector(".autocomplete-wrap");
+    if (wrap && !wrap.contains(e.target)) {
+      $("warlordSuggestions").classList.remove("show");
+    }
+  });
+  document.addEventListener("keydown", e => {
+    const list = $("warlordSuggestions");
+    if (!list.classList.contains("show")) return;
+    const items = list.querySelectorAll(".autocomplete-item");
+    if (!items.length) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      warlordActiveIdx = Math.min(warlordActiveIdx + 1, items.length - 1);
+      items.forEach((el, i) => el.classList.toggle("active", i === warlordActiveIdx));
+      items[warlordActiveIdx].scrollIntoView({ block: "nearest" });
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      warlordActiveIdx = Math.max(warlordActiveIdx - 1, 0);
+      items.forEach((el, i) => el.classList.toggle("active", i === warlordActiveIdx));
+      items[warlordActiveIdx].scrollIntoView({ block: "nearest" });
+    } else if (e.key === "Enter" && warlordActiveIdx >= 0) {
+      e.preventDefault();
+      items[warlordActiveIdx].dispatchEvent(new Event("mousedown"));
+    } else if (e.key === "Escape") {
+      list.classList.remove("show");
+    }
+  });
+})();
 
 function addAlly(side) {
   const containerId = side === "my" ? "my-allies" : "enemy-allies";
